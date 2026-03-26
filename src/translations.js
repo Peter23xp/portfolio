@@ -94,6 +94,7 @@ const translations = {
     contact_desc: "Je suis Peter Akilimali—un Étudiant en Ingénierie Logicielle originaire de Goma (RDC) et actuellement basé à Gisenyi (Rwanda). Je recherche activement mon Stage 2027 où je pourrai appliquer ma double perspective de marché et ma rigueur d'ingénieur pour résoudre vos défis business.",
     contact_btn_email: "M'envoyer un Email",
     contact_btn_linkedin: "Profil LinkedIn",
+    contact_btn_whatsapp: "Message WhatsApp",
     contact_origin: "Origine: Goma, RDC",
     
     footer_desc: "Ingénieur Logiciel & Architecte Business dédié à lier rigueur technique et valeur commerciale stratégique. Actuellement en préparation pour le paysage technique de 2027.",
@@ -204,6 +205,7 @@ const translations = {
     contact_desc: "I am Peter Akilimali—a Software Engineering Student from Goma (DRC) and currently based in Gisenyi (Rwanda). I am actively seeking my 2027 Internship where I can apply my dual market perspective and engineering rigor to solve your business challenges.",
     contact_btn_email: "Send me an Email",
     contact_btn_linkedin: "LinkedIn Profile",
+    contact_btn_whatsapp: "Message WhatsApp",
     contact_origin: "Origin: Goma, DRC",
     
     footer_desc: "Software Engineer & Business Architect dedicated to linking technical rigor and strategic business value. Currently preparing for the 2027 technical landscape.",
