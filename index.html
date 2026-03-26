@@ -395,7 +395,7 @@
       <div class="mb-16">
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tighter">
           <span data-i18n="proj_title">Projets</span> 
-          <span class="inline-block bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent px-1" data-i18n="proj_subtitle">
+          <span class="text-blue-600 px-1" data-i18n="proj_subtitle">
             Open Source
           </span>
         </h2>
@@ -403,6 +403,19 @@
           Explorer mes contributions sur <a href="https://github.com/Peter23xp" target="_blank" class="text-blue-600 font-bold hover:underline">GitHub</a>. Je conçois des outils qui résolvent des défis concrets, de la cybersécurité à la gestion.
         </p>
       </div>
+
+      <!-- GitHub Activity Graph -->
+      <div class="w-full overflow-x-auto pb-4 mb-16 rounded-[2rem] border border-slate-100 bg-white shadow-sm hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500">
+        <div class="min-w-[800px] p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <i class="ph-bold ph-git-merge text-2xl text-blue-600"></i>
+            <p class="text-sm font-bold text-slate-900 uppercase tracking-widest" data-i18n="proj_contrib">Activité GitHub</p>
+          </div>
+          <img src="https://ghchart.rshah.org/2563eb/Peter23xp" alt="Peter23xp GitHub Contributions" class="w-full mix-blend-multiply opacity-90 hover:opacity-100 transition-opacity" />
+        </div>
+      </div>
+
+
 
       <div id="github-projects" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px]">
         <!-- Skeleton Loaders appear while fetching -->

@@ -51,6 +51,7 @@ const translations = {
     proj_view_readme: "Visualiser le README",
     proj_error: "Oups ! Impossible de charger les projets en direct.",
     proj_retry: "Tenter de nouveau",
+    proj_contrib: "Activité GitHub",
     
     roadmap_title: "Feuille de Route",
     roadmap_subtitle: "Professionnelle",
@@ -160,6 +161,7 @@ const translations = {
     proj_view_readme: "View README",
     proj_error: "Oops! Unable to load projects live.",
     proj_retry: "Try again",
+    proj_contrib: "GitHub Activity",
     
     roadmap_title: "Professional",
     roadmap_subtitle: "Roadmap",
