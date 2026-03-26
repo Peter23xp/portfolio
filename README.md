@@ -11,7 +11,7 @@
 
 ## 🌐 Live Site
 
-**[peter-portfolio-3bck2x54n-peters-projects-76c5ad95.vercel.app](https://peter-portfolio-3bck2x54n-peters-projects-76c5ad95.vercel.app)**
+**[peter-portfolio-rho.vercel.app](https://peter-portfolio-rho.vercel.app)**
 
 ---
 
