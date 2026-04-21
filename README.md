@@ -5,13 +5,13 @@
 
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://vercel.com)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://peterakilimali.site)
 
 ---
 
 ## 🌐 Live Site
 
-**[peter-portfolio-rho.vercel.app](https://peter-portfolio-rho.vercel.app)**
+**[peterakilimali.site](https://peterakilimali.site)**
 
 ---
 
