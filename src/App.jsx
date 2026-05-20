@@ -709,7 +709,7 @@ function App() {
                 <span className="text-emerald-400">{total.toLocaleString()}</span> contributions <span className="text-neutral-600">cette année</span>
               </h2>
             </div>
-            <div className="animate-on-scroll overflow-x-auto" data-animation="up" data-delay="150">
+            <div className="animate-on-scroll overflow-x-auto flex justify-center" data-animation="up" data-delay="150">
               <div className="inline-flex gap-3 p-6 bg-neutral-900/40 border border-white/5 rounded-[2rem]">
                 {/* Day labels */}
                 <div className="flex flex-col justify-between pt-6 pb-0 gap-0" style={{minWidth:'28px'}}>
