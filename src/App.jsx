@@ -154,16 +154,26 @@ function App() {
           .filter(r => !r.fork)
           .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
         setRepos(filtered);
-        // fetch commit counts in parallel (per_page=1 + parse Link header last page = total)
+        // fetch commit counts via contributors stats (sum of all contributors' commits)
         filtered.forEach(repo => {
-          fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
-            .then(r => {
-              const link = r.headers.get('Link') || '';
-              const match = link.match(/page=(\d+)>; rel="last"/);
-              const count = match ? parseInt(match[1]) : 1;
-              setCommitCounts(prev => ({ ...prev, [repo.name]: count }));
-            })
-            .catch(() => {});
+          const tryFetch = (retries) => {
+            fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/stats/contributors`)
+              .then(r => {
+                // 202 = GitHub is computing stats, retry after delay
+                if (r.status === 202 && retries > 0) {
+                  setTimeout(() => tryFetch(retries - 1), 2000);
+                  return null;
+                }
+                return r.ok ? r.json() : null;
+              })
+              .then(data => {
+                if (!Array.isArray(data)) return;
+                const total = data.reduce((sum, c) => sum + (c.total || 0), 0);
+                if (total > 0) setCommitCounts(prev => ({ ...prev, [repo.name]: total }));
+              })
+              .catch(() => {});
+          };
+          tryFetch(3);
         });
       })
       .catch(() => {})
