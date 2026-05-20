@@ -284,7 +284,7 @@ function App() {
         </div>
 
         {/* Massive Typography with floating labels */}
-        <div className="group relative">
+        <div className="group relative pb-10">
           <div className="animate-on-scroll hidden lg:flex bg-neutral-900 z-20 border-neutral-700 border rounded-full px-5 py-2 absolute top-[0%] left-[38%] -top-4 shadow-sm gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="fade" data-delay="800">
             <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">Remote Friendly</span>
           </div>
