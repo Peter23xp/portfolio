@@ -602,9 +602,6 @@ function App() {
                         <span className="text-3xl font-black text-white font-bricolage group-hover:translate-x-1 transition-transform duration-300 leading-none">{commitCounts[repo.name] ?? '—'}</span>
                         <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500">commits</span>
                       </div>
-                      {repo.description && (
-                        <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{repo.description}</p>
-                      )}
                       <div className="flex items-center justify-between mt-1">
                         <a
                           href={repo.html_url}
