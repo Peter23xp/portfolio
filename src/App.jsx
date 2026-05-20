@@ -154,31 +154,27 @@ function App() {
           .filter(r => !r.fork)
           .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
         setRepos(filtered);
-        // fetch commit counts via contributors stats (sum of all contributors' commits)
-        filtered.forEach(repo => {
-          const tryFetch = (retries) => {
-            fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/stats/contributors`)
-              .then(r => {
-                // 202 = GitHub is computing stats, retry after delay
-                if (r.status === 202 && retries > 0) {
-                  setTimeout(() => tryFetch(retries - 1), 2000);
-                  return null;
-                }
-                return r.ok ? r.json() : null;
-              })
-              .then(data => {
-                if (!Array.isArray(data)) return;
-                const total = data.reduce((sum, c) => sum + (c.total || 0), 0);
-                if (total > 0) setCommitCounts(prev => ({ ...prev, [repo.name]: total }));
-              })
-              .catch(() => {});
-          };
-          tryFetch(3);
-        });
       })
       .catch(() => {})
       .finally(() => setReposLoading(false));
   }, []);
+
+  // fetch commit counts only for currently visible repos (saves API quota)
+  useEffect(() => {
+    const visible = showAllRepos ? repos : repos.slice(0, 4);
+    visible.forEach(repo => {
+      if (commitCounts[repo.name] !== undefined) return; // already fetched
+      fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
+        .then(r => {
+          if (!r.ok) return;
+          const link = r.headers.get('Link') || '';
+          const match = link.match(/[?&]page=(\d+)>;\s*rel="last"/);
+          const count = match ? parseInt(match[1]) : 1;
+          setCommitCounts(prev => ({ ...prev, [repo.name]: count }));
+        })
+        .catch(() => {});
+    });
+  }, [repos, showAllRepos]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
