@@ -232,7 +232,7 @@ function App() {
       <img
         src="/peter.jpeg"
         alt="Peter Akilimali"
-        className="w-1/3 md:w-1/2 h-[960px] object-cover object-top rounded-[40px] absolute top-4 right-4 bottom-0 pointer-events-none opacity-40 md:opacity-100"
+        className="w-1/2 h-[960px] object-cover object-top rounded-[40px] absolute top-4 right-4 bottom-0 pointer-events-none opacity-40 md:opacity-100"
       />
 
       {/* Background gradient */}
