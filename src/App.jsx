@@ -291,7 +291,7 @@ function App() {
           <div className="animate-on-scroll hidden lg:flex bg-neutral-900 z-20 border-neutral-700 border rounded-full px-5 py-2 absolute top-[45%] right-[0%] shadow-sm gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="right" data-delay="900">
             <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">ULK 2027</span>
           </div>
-          <div className="animate-on-scroll hidden lg:flex z-20 gap-2 text-neutral-950 bg-emerald-400 rounded-full px-5 py-2 absolute bottom-[-12%] left-[2%] shadow-lg gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="left" data-delay="1000">
+          <div className="animate-on-scroll hidden lg:flex z-20 gap-2 text-neutral-950 bg-emerald-400 rounded-full px-5 py-2 absolute top-[55%] left-[5%] shadow-lg gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="left" data-delay="1000">
             <span className="text-[0.65rem] font-bold uppercase tracking-widest">Full-Stack</span>
           </div>
           <h1 className="text-[16vw] md:text-[14vw] lg:text-[12rem] leading-[0.8] uppercase select-none md:text-left font-medium text-white tracking-tighter font-oswald text-center mix-blend-normal max-w-4xl">
