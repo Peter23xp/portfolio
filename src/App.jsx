@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 const GITHUB_USER = 'Peter23xp';
+const GH_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+const ghFetch = (url) => fetch(url, GH_TOKEN ? { headers: { Authorization: `Bearer ${GH_TOKEN}` } } : {});
 
 const langColors = {
   JavaScript: '#fbbf24',
@@ -24,7 +26,7 @@ function RepoModal({ repo, onClose }) {
 
   useEffect(() => {
     fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/readme`, {
-      headers: { Accept: 'application/vnd.github.raw' }
+      headers: { Accept: 'application/vnd.github.raw', ...(GH_TOKEN ? { Authorization: `Bearer ${GH_TOKEN}` } : {}) }
     })
       .then(r => r.ok ? r.text() : Promise.reject())
       .then(text => setReadme(text))
@@ -146,7 +148,7 @@ function App() {
   const [commitCounts, setCommitCounts] = useState({});
 
   useEffect(() => {
-    fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
+    ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
       .then(r => r.json())
       .then(data => {
         if (!Array.isArray(data)) return;
@@ -164,7 +166,7 @@ function App() {
     const visible = showAllRepos ? repos : repos.slice(0, 4);
     visible.forEach(repo => {
       if (commitCounts[repo.name] !== undefined) return; // already fetched
-      fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
+      ghFetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
         .then(r => {
           if (!r.ok) return;
           const link = r.headers.get('Link') || '';
