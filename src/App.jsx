@@ -48,10 +48,12 @@ function App() {
     }, { threshold: 0.1 });
 
     if (containerRef.current) {
-      containerRef.current.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+      containerRef.current
+        .querySelectorAll('.animate-on-scroll:not(.animate-up):not(.animate-left):not(.animate-right):not(.animate-fade)')
+        .forEach(el => observer.observe(el));
     }
     return () => observer.disconnect();
-  }, [repos]);
+  }, [repos, showAllRepos]);
 
   return (
     <main ref={containerRef} className="border-gradient xl:rounded-[3.5rem] xl:p-12 overflow-hidden flex flex-col xl:max-w-[96rem] xl:shadow-2xl bg-neutral-900 w-full rounded-none pt-6 pr-6 pb-6 pl-6 relative shadow-none justify-between">
