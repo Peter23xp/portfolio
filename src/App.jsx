@@ -785,30 +785,20 @@ function App() {
             </div>
           </div>
 
-          <div className="lg:col-span-7 bg-white text-neutral-950 rounded-[2.5rem] p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-7 bg-white text-neutral-950 rounded-[2.5rem] p-8 md:p-16 flex flex-col justify-between gap-12 relative overflow-hidden">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-100 rounded-full blur-[80px] opacity-60 pointer-events-none"></div>
             {[
-              { icon:'solar:diploma-bold-duotone', iconColor:'#4ade80', period:'2023–2027', title:'ULK — Ingénierie Logicielle', subtitle:'Kigali · Architecture Système', badgeBg:'#f0fdf4', badgeBorder:'#bbf7d0', badgeColor:'#15803d', badgeText:'Présent', pulse:false },
-              { icon:'solar:cpu-bolt-bold-duotone', iconColor:'#60a5fa', period:'2021–2023', title:'Support Technique & Systèmes', subtitle:'Maintenance · Optimisation', badgeBg:'#eff6ff', badgeBorder:'#bfdbfe', badgeColor:'#1d4ed8', badgeText:'Expérience', pulse:false },
-              { icon:'solar:chart-2-bold-duotone', iconColor:'#c084fc', period:'Avant 2021', title:'Diplôme — Commercial & Gestion', subtitle:'Économie · Comptabilité', badgeBg:'#faf5ff', badgeBorder:'#e9d5ff', badgeColor:'#7e22ce', badgeText:'Fondation', pulse:false },
-              { icon:'solar:rocket-bold-duotone', iconColor:'#fb923c', period:'2026', title:'Stage Ingénierie Logicielle', subtitle:'Objectif · Disponible', badgeBg:'#fff7ed', badgeBorder:'#fed7aa', badgeColor:'#c2410c', badgeText:'Ouvert', pulse:true },
-            ].map(({ icon, iconColor, period, title, subtitle, badgeBg, badgeBorder, badgeColor, badgeText, pulse }, i, arr) => (
+              { period:'2023–2027', title:'ULK — Ingénierie Logicielle', subtitle:'Kigali · Architecture Système · Présent' },
+              { period:'2021–2023', title:'Support Technique & Systèmes', subtitle:'Maintenance · Optimisation · Expérience' },
+              { period:'Avant 2021', title:'Diplôme Commercial & Gestion', subtitle:'Économie · Comptabilité · Fondation' },
+              { period:'2026', title:'Stage Ingénierie Logicielle', subtitle:'Objectif · Disponible · Ouvert' },
+            ].map(({ period, title, subtitle }, i, arr) => (
               <React.Fragment key={title}>
-                <div className="animate-on-scroll flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center relative z-10 py-6 group" data-animation="up" data-delay={String(i * 100)}>
-                  <div className="flex items-center gap-4 w-full sm:w-52 shrink-0">
-                    <div className="w-10 h-10 rounded-xl bg-neutral-950 flex items-center justify-center shrink-0">
-                      <iconify-icon icon={icon} style={{fontSize:'1.25rem',color:iconColor}}></iconify-icon>
-                    </div>
-                    <span className="text-sm font-bold tracking-tight text-neutral-900 whitespace-nowrap">{period}</span>
-                  </div>
-                  <div className="flex-1 flex flex-col gap-1">
-                    <span className="text-base font-semibold text-neutral-900 tracking-tight">{title}</span>
-                    <span className="text-xs text-neutral-400 uppercase tracking-widest">{subtitle}</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full shrink-0 border" style={{background:badgeBg, borderColor:badgeBorder}}>
-                    {pulse && <span className="w-2 h-2 rounded-full bg-orange-400 animate-ping inline-block"></span>}
-                    {pulse && <span className="w-2 h-2 rounded-full bg-orange-400 inline-block -ml-1"></span>}
-                    <span className="text-[0.65rem] font-black uppercase tracking-widest whitespace-nowrap" style={{color:badgeColor}}>{badgeText}</span>
+                <div className="animate-on-scroll flex flex-col sm:flex-row gap-6 sm:gap-12 items-start sm:items-center relative z-10 group" data-animation="up" data-delay={String(i * 100)}>
+                  <span className="text-6xl md:text-7xl font-medium tracking-tighter font-bricolage w-48 shrink-0 group-hover:scale-105 transition-transform duration-500 origin-left">{period}</span>
+                  <div className="flex flex-col gap-2 max-w-xs">
+                    <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+                    <p className="text-xs text-neutral-500 font-medium leading-relaxed uppercase tracking-wide">{subtitle}</p>
                   </div>
                 </div>
                 {i < arr.length - 1 && <div className="h-px w-full bg-neutral-100"></div>}
