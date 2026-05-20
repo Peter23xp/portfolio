@@ -70,7 +70,7 @@ function RepoModal({ repo, onClose }) {
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
           >
-            <iconify-icon icon="solar:close-bold" style={{fontSize:'1rem'}}></iconify-icon>
+            <iconify-icon icon="solar:close-circle-bold-duotone" style={{fontSize:'1rem'}}></iconify-icon>
           </button>
         </div>
 
