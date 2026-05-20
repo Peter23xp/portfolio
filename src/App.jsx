@@ -95,11 +95,27 @@ function App() {
   const [reposLoading, setReposLoading] = useState(true);
   const [showAllRepos, setShowAllRepos] = useState(false);
   const [readmeRepo, setReadmeRepo] = useState(null);
+  const [commitCounts, setCommitCounts] = useState({});
 
   useEffect(() => {
     fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`)
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setRepos(data.filter(r => !r.fork)); })
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        const filtered = data.filter(r => !r.fork);
+        setRepos(filtered);
+        // fetch commit counts in parallel (per_page=1 + parse Link header last page = total)
+        filtered.forEach(repo => {
+          fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
+            .then(r => {
+              const link = r.headers.get('Link') || '';
+              const match = link.match(/page=(\d+)>; rel="last"/);
+              const count = match ? parseInt(match[1]) : 1;
+              setCommitCounts(prev => ({ ...prev, [repo.name]: count }));
+            })
+            .catch(() => {});
+        });
+      })
       .catch(() => {})
       .finally(() => setReposLoading(false));
   }, []);
@@ -528,9 +544,9 @@ function App() {
                     {/* Center watermark: repo name */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden px-6">
                       <span
-                        className="text-white font-bricolage font-bold text-center leading-none select-none transition-all duration-500 opacity-[0.06] group-hover:opacity-[0.14]"
-                        style={{fontSize:'clamp(1.5rem, 5vw, 3rem)', wordBreak:'break-word', textAlign:'center', textTransform:'uppercase', letterSpacing:'-0.04em'}}
-                      >{repo.name}</span>
+                        className="text-white font-bricolage font-black leading-none select-none transition-all duration-500 opacity-[0.07] group-hover:opacity-[0.18]"
+                        style={{fontSize:'clamp(4rem, 10vw, 7rem)', letterSpacing:'-0.06em', lineHeight:1}}
+                      >{commitCounts[repo.name] ?? '—'}</span>
                     </div>
                     {/* Bottom: repo name + description + actions */}
                     <div className="z-10 relative flex flex-col gap-2 border-t border-white/5 pt-4">
