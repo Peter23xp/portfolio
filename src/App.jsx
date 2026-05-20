@@ -544,13 +544,16 @@ function App() {
                     {/* Center watermark: repo name */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden px-6">
                       <span
-                        className="text-white font-bricolage font-black leading-none select-none transition-all duration-500 opacity-[0.07] group-hover:opacity-[0.18]"
-                        style={{fontSize:'clamp(4rem, 10vw, 7rem)', letterSpacing:'-0.06em', lineHeight:1}}
-                      >{commitCounts[repo.name] ?? '—'}</span>
+                        className="text-white font-bricolage font-bold text-center leading-none select-none transition-all duration-500 opacity-[0.06] group-hover:opacity-[0.14]"
+                        style={{fontSize:'clamp(1.5rem, 5vw, 3rem)', wordBreak:'break-word', textAlign:'center', textTransform:'uppercase', letterSpacing:'-0.04em'}}
+                      >{repo.name}</span>
                     </div>
-                    {/* Bottom: repo name + description + actions */}
+                    {/* Bottom: commit count + description + actions */}
                     <div className="z-10 relative flex flex-col gap-2 border-t border-white/5 pt-4">
-                      <span className="text-2xl font-medium text-white font-bricolage group-hover:translate-x-1 transition-transform duration-300 truncate block">{repo.name}</span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-white font-bricolage group-hover:translate-x-1 transition-transform duration-300 leading-none">{commitCounts[repo.name] ?? '—'}</span>
+                        <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500">commits</span>
+                      </div>
                       {repo.description && (
                         <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{repo.description}</p>
                       )}
