@@ -146,11 +146,13 @@ function App() {
   const [commitCounts, setCommitCounts] = useState({});
 
   useEffect(() => {
-    fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`)
+    fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
       .then(r => r.json())
       .then(data => {
         if (!Array.isArray(data)) return;
-        const filtered = data.filter(r => !r.fork);
+        const filtered = data
+          .filter(r => !r.fork)
+          .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
         setRepos(filtered);
         // fetch commit counts in parallel (per_page=1 + parse Link header last page = total)
         filtered.forEach(repo => {
