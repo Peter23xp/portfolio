@@ -15,11 +15,86 @@ const langColors = {
   Go: '#4ade80',
 };
 
+function ReadmeModal({ repo, onClose }) {
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/readme`, {
+      headers: { Accept: 'application/vnd.github.raw' }
+    })
+      .then(r => r.ok ? r.text() : Promise.reject())
+      .then(text => setContent(text))
+      .catch(() => setContent(null))
+      .finally(() => setLoading(false));
+  }, [repo.name]);
+
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+      style={{background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)'}}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="relative bg-neutral-950 border border-neutral-800 rounded-[2rem] w-full max-w-3xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-800 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <iconify-icon icon="solar:document-bold-duotone" class="text-emerald-400" style={{fontSize:'1.25rem'}}></iconify-icon>
+            <span className="text-white font-semibold text-sm uppercase tracking-widest font-bricolage">{repo.name}</span>
+            <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500 border border-white/5 px-2 py-1 rounded-md bg-neutral-900/50">README</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
+          >
+            <iconify-icon icon="solar:close-bold" style={{fontSize:'1rem'}}></iconify-icon>
+          </button>
+        </div>
+        {/* Body */}
+        <div className="overflow-y-auto px-8 py-6 flex-1">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : content ? (
+            <pre className="text-neutral-300 text-xs leading-relaxed whitespace-pre-wrap font-mono">{content}</pre>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-neutral-500">
+              <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'2.5rem', opacity:0.3}}></iconify-icon>
+              <p className="text-xs uppercase tracking-widest">Pas de README pour ce dépôt</p>
+            </div>
+          )}
+        </div>
+        {/* Footer */}
+        <div className="px-8 py-4 border-t border-neutral-800 flex-shrink-0 flex justify-end">
+          <a
+            href={repo.html_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 transition-all"
+          >
+            <iconify-icon icon="simple-icons:github" style={{fontSize:'1rem'}}></iconify-icon>
+            Ouvrir sur GitHub
+            <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-emerald-400" style={{fontSize:'0.875rem'}}></iconify-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const containerRef = useRef(null);
   const [repos, setRepos] = useState([]);
   const [reposLoading, setReposLoading] = useState(true);
   const [showAllRepos, setShowAllRepos] = useState(false);
+  const [readmeRepo, setReadmeRepo] = useState(null);
 
   useEffect(() => {
     fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`)
@@ -431,17 +506,14 @@ function App() {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-emerald-900/10 blur-[120px] rounded-full pointer-events-none"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
                 {(showAllRepos ? repos : repos.slice(0, 4)).map((repo, index) => (
-                  <a
+                  <div
                     key={repo.id}
-                    href={repo.html_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`animate-on-scroll group relative flex flex-col justify-between h-[420px] bg-neutral-950/40 backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-[2rem] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(16,185,129,0.1)] overflow-hidden no-underline ${index % 2 === 0 ? 'animate-levitate' : 'animate-levitate-delayed'} ${index % 2 === 1 ? 'lg:mt-12' : ''}`}
+                    className={`animate-on-scroll group relative flex flex-col justify-between h-[420px] bg-neutral-950/40 backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-[2rem] p-8 transition-all duration-500 overflow-hidden ${index % 2 === 0 ? 'animate-levitate' : 'animate-levitate-delayed'} ${index % 2 === 1 ? 'lg:mt-12' : ''}`}
                     data-animation="up"
                     data-delay={String(200 + (index % 4) * 100)}
-                    style={{textDecoration:'none'}}
                   >
                     <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    {/* Top row: language + stars */}
                     <div className="flex justify-between items-start z-10 relative">
                       <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500 border border-white/5 px-2 py-1 rounded-md bg-neutral-900/50">
                         {repo.language || 'Code'}
@@ -453,20 +525,41 @@ function App() {
                         </span>
                       </div>
                     </div>
-                    <div className="absolute inset-0 flex items-center justify-center opacity-40 group-hover:opacity-100 transition-all duration-500 grayscale group-hover:grayscale-0 group-hover:scale-110 pointer-events-none">
-                      <iconify-icon icon="solar:code-square-bold-duotone" class="text-white" style={{fontSize:'5rem'}}></iconify-icon>
+                    {/* Center watermark: repo name */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden px-6">
+                      <span
+                        className="text-white font-bricolage font-bold text-center leading-none select-none transition-all duration-500 opacity-[0.06] group-hover:opacity-[0.14]"
+                        style={{fontSize:'clamp(1.5rem, 5vw, 3rem)', wordBreak:'break-word', textAlign:'center', textTransform:'uppercase', letterSpacing:'-0.04em'}}
+                      >{repo.name}</span>
                     </div>
-                    <div className="z-10 relative flex flex-col gap-1 border-t border-white/5 pt-4">
+                    {/* Bottom: repo name + description + actions */}
+                    <div className="z-10 relative flex flex-col gap-2 border-t border-white/5 pt-4">
                       <span className="text-2xl font-medium text-white font-bricolage group-hover:translate-x-1 transition-transform duration-300 truncate block">{repo.name}</span>
                       {repo.description && (
                         <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{repo.description}</p>
                       )}
-                      <p className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-2 mt-1">
-                        GitHub
-                        <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-neutral-600 group-hover:text-white transition-colors" style={{fontSize:'0.75rem'}}></iconify-icon>
-                      </p>
+                      <div className="flex items-center justify-between mt-1">
+                        <a
+                          href={repo.html_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:text-white transition-colors"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <iconify-icon icon="simple-icons:github" style={{fontSize:'0.875rem'}}></iconify-icon>
+                          GitHub
+                          <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-neutral-600 group-hover:text-white transition-colors" style={{fontSize:'0.75rem'}}></iconify-icon>
+                        </a>
+                        <button
+                          onClick={() => setReadmeRepo(repo)}
+                          className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:text-emerald-400 transition-colors"
+                        >
+                          <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
+                          README
+                        </button>
+                      </div>
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             </div>
@@ -656,6 +749,11 @@ function App() {
       <div className="hidden lg:flex w-32 h-32 border-neutral-700/30 border rounded-full absolute right-[25%] bottom-[20%] items-center justify-center" style={{animation:'spin 10s linear infinite'}}>
         <div className="w-full h-[1px] bg-neutral-700/30"></div>
       </div>
+
+      {/* README Modal */}
+      {readmeRepo && (
+        <ReadmeModal repo={readmeRepo} onClose={() => setReadmeRepo(null)} />
+      )}
     </main>
   );
 }
