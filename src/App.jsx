@@ -15,25 +15,41 @@ const langColors = {
   Go: '#4ade80',
 };
 
-function ReadmeModal({ repo, onClose }) {
-  const [content, setContent] = useState(null);
-  const [loading, setLoading] = useState(true);
+function RepoModal({ repo, onClose }) {
+  const [readme, setReadme] = useState(null);
+  const [readmeLoading, setReadmeLoading] = useState(true);
+  // tab: 'readme' | 'description'
+  const hasDesc = !!repo.description;
+  const [tab, setTab] = useState('readme');
 
   useEffect(() => {
     fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/readme`, {
       headers: { Accept: 'application/vnd.github.raw' }
     })
       .then(r => r.ok ? r.text() : Promise.reject())
-      .then(text => setContent(text))
-      .catch(() => setContent(null))
-      .finally(() => setLoading(false));
+      .then(text => setReadme(text))
+      .catch(() => setReadme(null))
+      .finally(() => {
+        setReadmeLoading(false);
+      });
   }, [repo.name]);
+
+  // once loading done, default to whichever tab has content
+  useEffect(() => {
+    if (!readmeLoading) {
+      if (readme) setTab('readme');
+      else if (hasDesc) setTab('description');
+    }
+  }, [readmeLoading]);
 
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  const hasReadme = !!readme;
+  const showTabs = hasReadme && hasDesc;
 
   return (
     <div
@@ -47,7 +63,6 @@ function ReadmeModal({ repo, onClose }) {
           <div className="flex items-center gap-3">
             <iconify-icon icon="solar:document-bold-duotone" class="text-emerald-400" style={{fontSize:'1.25rem'}}></iconify-icon>
             <span className="text-white font-semibold text-sm uppercase tracking-widest font-bricolage">{repo.name}</span>
-            <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500 border border-white/5 px-2 py-1 rounded-md bg-neutral-900/50">README</span>
           </div>
           <button
             onClick={onClose}
@@ -56,21 +71,54 @@ function ReadmeModal({ repo, onClose }) {
             <iconify-icon icon="solar:close-bold" style={{fontSize:'1rem'}}></iconify-icon>
           </button>
         </div>
+
+        {/* Tabs — only shown when both exist */}
+        {showTabs && (
+          <div className="flex gap-1 px-8 pt-4 flex-shrink-0">
+            {[
+              { key: 'readme', label: 'README', icon: 'solar:document-bold-duotone' },
+              { key: 'description', label: 'Description', icon: 'solar:info-circle-bold-duotone' },
+            ].map(({ key, label, icon }) => (
+              <button
+                key={key}
+                onClick={() => setTab(key)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[0.65rem] font-bold uppercase tracking-widest transition-all ${
+                  tab === key
+                    ? 'bg-neutral-800 text-white border border-neutral-700'
+                    : 'text-neutral-500 hover:text-neutral-300'
+                }`}
+              >
+                <iconify-icon icon={icon} style={{fontSize:'0.875rem'}}></iconify-icon>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Body */}
         <div className="overflow-y-auto px-8 py-6 flex-1">
-          {loading ? (
+          {readmeLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : content ? (
-            <pre className="text-neutral-300 text-xs leading-relaxed whitespace-pre-wrap font-mono">{content}</pre>
+          ) : tab === 'readme' && hasReadme ? (
+            <pre className="text-neutral-300 text-xs leading-relaxed whitespace-pre-wrap font-mono">{readme}</pre>
+          ) : tab === 'description' && hasDesc ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <iconify-icon icon="solar:info-circle-bold-duotone" class="text-emerald-400" style={{fontSize:'1.25rem'}}></iconify-icon>
+                <span className="text-white font-semibold text-sm uppercase tracking-widest">Description</span>
+              </div>
+              <p className="text-neutral-300 text-sm leading-relaxed">{repo.description}</p>
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 gap-3 text-neutral-500">
               <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'2.5rem', opacity:0.3}}></iconify-icon>
-              <p className="text-xs uppercase tracking-widest">Pas de README pour ce dépôt</p>
+              <p className="text-xs uppercase tracking-widest">Aucune documentation disponible</p>
             </div>
           )}
         </div>
+
         {/* Footer */}
         <div className="px-8 py-4 border-t border-neutral-800 flex-shrink-0 flex justify-end">
           <a
@@ -771,7 +819,7 @@ function App() {
 
       {/* README Modal */}
       {readmeRepo && (
-        <ReadmeModal repo={readmeRepo} onClose={() => setReadmeRepo(null)} />
+        <RepoModal repo={readmeRepo} onClose={() => setReadmeRepo(null)} />
       )}
     </main>
   );
