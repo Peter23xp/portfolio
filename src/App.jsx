@@ -339,9 +339,9 @@ function App() {
             <span className="text-[0.65rem] font-bold uppercase tracking-widest">{t.hero.fullstackLabel}</span>
           </div>
           <h1 className="text-[16vw] md:text-[14vw] lg:text-[12rem] leading-[0.8] uppercase select-none md:text-left font-medium text-white tracking-tighter font-oswald text-center mix-blend-normal max-w-4xl">
-            <span className="animate-on-scroll inline-block" data-animation="up" data-delay="400">Your</span>
-            <span className="animate-on-scroll inline-block pl-0 md:pl-16" data-animation="up" data-delay="500">Creative</span>
-            <span className="animate-on-scroll block text-neutral-600" data-animation="up" data-delay="600">Journey</span>
+            <span className="animate-on-scroll inline-block" data-animation="up" data-delay="400">{t.hero.h1word1}</span>
+            <span className="animate-on-scroll inline-block pl-0 md:pl-16" data-animation="up" data-delay="500">{t.hero.h1word2}</span>
+            <span className="animate-on-scroll block text-neutral-600" data-animation="up" data-delay="600">{t.hero.h1word3}</span>
           </h1>
         </div>
       </div>

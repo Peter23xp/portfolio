@@ -8,6 +8,9 @@ export const translations = {
       cv: 'CV PDF',
     },
     hero: {
+      h1word1: 'Code',
+      h1word2: 'Build',
+      h1word3: 'Ship',
       badge: 'Ouvert aux stages 2026 · Gisenyi, Rwanda',
       remoteLabel: 'Remote Friendly',
       fullstackLabel: 'Full-Stack',
@@ -105,6 +108,9 @@ export const translations = {
       cv: 'Resume PDF',
     },
     hero: {
+      h1word1: 'Code',
+      h1word2: 'Build',
+      h1word3: 'Ship',
       badge: 'Open to internships 2026 · Gisenyi, Rwanda',
       remoteLabel: 'Remote Friendly',
       fullstackLabel: 'Full-Stack',
