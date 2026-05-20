@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin')
+
 export default {
   content: [
     "./index.html",
@@ -6,30 +8,42 @@ export default {
   ],
   theme: {
     extend: {
-      animation: {
-        'fade-in': 'fadeIn 1.5s ease-out forwards',
-        'bounce-slow': 'bounce 3s infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'slide-infinite': 'slide 8s cubic-bezier(0.83, 0, 0.17, 1) infinite',
+      fontFamily: {
+        space: ['"Space Grotesk"', 'sans-serif'],
+        oswald: ['"Oswald"', 'sans-serif'],
+        bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
       },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        slide: {
-          '0%, 20%': { transform: 'translateY(0)' },
-          '33.33%, 53.33%': { transform: 'translateY(-33.33%)' },
-          '66.66%, 86.66%': { transform: 'translateY(-66.66%)' },
-          '100%': { transform: 'translateY(0)' },
-        }
-      }
     },
   },
-  plugins: [],
-}
+  plugins: [
+    plugin(function({ addUtilities }) {
+      const rotateValues = [0, 5, 10, 15, 20, 30, 45, 75];
+      const rotateXUtilities = {};
+      const rotateYUtilities = {};
+      const rotateZUtilities = {};
 
+      rotateValues.forEach((value) => {
+        const transform = `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))`;
+        rotateXUtilities[`.rotate-x-${value}`] = { '--tw-rotate-x': `${value}deg`, transform };
+        rotateYUtilities[`.rotate-y-${value}`] = { '--tw-rotate-y': `${value}deg`, transform };
+        rotateZUtilities[`.rotate-z-${value}`] = { '--tw-rotate-z': `${value}deg`, transform };
+        if (value !== 0) {
+          rotateXUtilities[`.-rotate-x-${value}`] = { '--tw-rotate-x': `-${value}deg`, transform };
+          rotateYUtilities[`.-rotate-y-${value}`] = { '--tw-rotate-y': `-${value}deg`, transform };
+          rotateZUtilities[`.-rotate-z-${value}`] = { '--tw-rotate-z': `-${value}deg`, transform };
+        }
+      });
+
+      addUtilities({
+        ...rotateXUtilities,
+        ...rotateYUtilities,
+        ...rotateZUtilities,
+        ".perspective-none": { perspective: "none" },
+        ".perspective-[1000px]": { perspective: "1000px" },
+        ".perspective-[2000px]": { perspective: "2000px" },
+        ".transform-style-preserve-3d": { "transform-style": "preserve-3d" },
+        ".transform-style-flat": { "transform-style": "flat" },
+      });
+    })
+  ],
+}
