@@ -235,7 +235,7 @@ function App() {
           >
             <div className="relative h-28 mb-4 overflow-hidden" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
               <div className="marquee-content flex flex-col" style={{animationDuration:'18s'}}>
-                {['solar:letter-bold-duotone|#818cf8|Email', 'solar:linkedin-bold-duotone|#60a5fa|LinkedIn', 'solar:chat-round-bold-duotone|#4ade80|WhatsApp', 'solar:code-bold-duotone|#a3a3a3|GitHub', 'solar:letter-bold-duotone|#818cf8|Email', 'solar:linkedin-bold-duotone|#60a5fa|LinkedIn', 'solar:chat-round-bold-duotone|#4ade80|WhatsApp', 'solar:code-bold-duotone|#a3a3a3|GitHub'].map((item, i) => {
+                {['solar:letter-bold-duotone|#818cf8|Email', 'simple-icons:linkedin|#60a5fa|LinkedIn', 'solar:chat-round-bold-duotone|#4ade80|WhatsApp', 'solar:code-bold-duotone|#a3a3a3|GitHub', 'solar:letter-bold-duotone|#818cf8|Email', 'simple-icons:linkedin|#60a5fa|LinkedIn', 'solar:chat-round-bold-duotone|#4ade80|WhatsApp', 'solar:code-bold-duotone|#a3a3a3|GitHub'].map((item, i) => {
                   const [icon, color, label] = item.split('|');
                   return (
                     <div key={i} className="flex items-center gap-2 pb-3">
@@ -554,7 +554,7 @@ function App() {
               <span className="relative z-10">M'envoyer un Email</span>
             </a>
             <a href="https://www.linkedin.com/in/peter-akilimali-1a7016282/" target="_blank" rel="noopener noreferrer" className="animate-on-scroll px-6 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2" data-animation="up" data-delay="250">
-              <iconify-icon icon="solar:linkedin-bold-duotone" class="text-blue-400" style={{fontSize:'1rem'}}></iconify-icon>
+              <iconify-icon icon="simple-icons:linkedin" class="text-blue-400" style={{fontSize:'1rem'}}></iconify-icon>
               LinkedIn
             </a>
             <a href="https://wa.me/243902238740" target="_blank" rel="noopener noreferrer" className="animate-on-scroll px-6 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2" data-animation="up" data-delay="300">
@@ -581,7 +581,7 @@ function App() {
               </p>
               <div className="flex items-center gap-4 mt-2">
                 {[
-                  {href:'https://www.linkedin.com/in/peter-akilimali-1a7016282/',icon:'solar:linkedin-bold-duotone'},
+                  {href:'https://www.linkedin.com/in/peter-akilimali-1a7016282/',icon:'simple-icons:linkedin'},
                   {href:'tel:+243998439596',icon:'solar:phone-bold-duotone'},
                   {href:'mailto:peter23xp@gmail.com',icon:'solar:letter-bold-duotone'},
                 ].map(({href,icon}) => (
