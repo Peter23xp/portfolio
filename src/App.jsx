@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { translations } from './i18n.js';
 
 const GITHUB_USER = 'Peter23xp';
 const GH_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
@@ -17,7 +18,8 @@ const langColors = {
   Go: '#4ade80',
 };
 
-function RepoModal({ repo, onClose }) {
+function RepoModal({ repo, onClose, lang }) {
+  const t = translations[lang].modal;
   const [readme, setReadme] = useState(null);
   const [readmeLoading, setReadmeLoading] = useState(true);
   // tab: 'readme' | 'description'
@@ -78,8 +80,8 @@ function RepoModal({ repo, onClose }) {
         {showTabs && (
           <div className="flex gap-1 px-8 pt-4 flex-shrink-0">
             {[
-              { key: 'readme', label: 'README', icon: 'solar:document-bold-duotone' },
-              { key: 'description', label: 'Description', icon: 'solar:info-circle-bold-duotone' },
+              { key: 'readme', label: t.readme, icon: 'solar:document-bold-duotone' },
+              { key: 'description', label: t.description, icon: 'solar:info-circle-bold-duotone' },
             ].map(({ key, label, icon }) => (
               <button
                 key={key}
@@ -109,14 +111,14 @@ function RepoModal({ repo, onClose }) {
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <iconify-icon icon="solar:info-circle-bold-duotone" class="text-emerald-400" style={{fontSize:'1.25rem'}}></iconify-icon>
-                <span className="text-white font-semibold text-sm uppercase tracking-widest">Description</span>
+                <span className="text-white font-semibold text-sm uppercase tracking-widest">{t.description}</span>
               </div>
               <p className="text-neutral-300 text-sm leading-relaxed">{repo.description}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 gap-3 text-neutral-500">
               <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'2.5rem', opacity:0.3}}></iconify-icon>
-              <p className="text-xs uppercase tracking-widest">Aucune documentation disponible</p>
+              <p className="text-xs uppercase tracking-widest">{t.noDoc}</p>
             </div>
           )}
         </div>
@@ -130,7 +132,7 @@ function RepoModal({ repo, onClose }) {
             className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 transition-all"
           >
             <iconify-icon icon="simple-icons:github" style={{fontSize:'1rem'}}></iconify-icon>
-            Ouvrir sur GitHub
+            {t.openGithub}
             <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-emerald-400" style={{fontSize:'0.875rem'}}></iconify-icon>
           </a>
         </div>
@@ -141,6 +143,8 @@ function RepoModal({ repo, onClose }) {
 
 function App() {
   const containerRef = useRef(null);
+  const [lang, setLang] = useState('fr');
+  const t = translations[lang];
   const [repos, setRepos] = useState([]);
   const [reposLoading, setReposLoading] = useState(true);
   const [showAllRepos, setShowAllRepos] = useState(false);
@@ -249,15 +253,25 @@ function App() {
         </div>
         <div className="hidden md:flex items-center gap-12 text-xs font-medium tracking-widest uppercase text-neutral-400">
           <a href="#projets" className="animate-on-scroll hover:text-white transition-colors flex items-center gap-2" data-animation="up" data-delay="100">
-            <div className="w-2 h-2 rounded-full bg-white"></div>Projets
+            <div className="w-2 h-2 rounded-full bg-white"></div>{t.nav.projects}
           </a>
           <a href="#expertise" className="animate-on-scroll hover:text-white transition-colors flex items-center gap-2" data-animation="up" data-delay="150">
-            <div className="w-2 h-2 rounded-full border border-neutral-600"></div>Expertise
+            <div className="w-2 h-2 rounded-full border border-neutral-600"></div>{t.nav.expertise}
           </a>
-          <a href="#parcours" className="animate-on-scroll hover:text-white transition-colors mix-blend-hard-light" data-animation="up" data-delay="200">Parcours</a>
-          <a href="#contact" className="animate-on-scroll hover:text-white transition-colors" data-animation="up" data-delay="250">Contact</a>
+          <a href="#parcours" className="animate-on-scroll hover:text-white transition-colors mix-blend-hard-light" data-animation="up" data-delay="200">{t.nav.parcours}</a>
+          <a href="#contact" className="animate-on-scroll hover:text-white transition-colors" data-animation="up" data-delay="250">{t.nav.contact}</a>
         </div>
         <div className="flex items-center gap-4">
+          {/* Language switcher */}
+          <button
+            onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
+            className="animate-on-scroll hidden md:flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all"
+            data-animation="right"
+            data-delay="50"
+          >
+            <iconify-icon icon="solar:global-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
+            {lang === 'fr' ? 'EN' : 'FR'}
+          </button>
           <a
             href="/peterCv.pdf"
             download
@@ -266,7 +280,7 @@ function App() {
             data-delay="100"
             style={{ position: 'relative', '--border-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))', '--border-radius-before': '9999px' }}
           >
-            CV PDF
+            {t.nav.cv}
           </a>
           <button className="md:hidden p-3 rounded-full bg-white text-neutral-950">
             <iconify-icon icon="solar:hamburger-menu-bold-duotone" style={{fontSize:'1.25rem'}}></iconify-icon>
@@ -279,20 +293,20 @@ function App() {
         {/* Badge */}
         <div className="animate-on-scroll flex md:mb-4 md:mt-12 mt-4 mb-6 gap-x-4 gap-y-4 items-center" data-animation="up" data-delay="300">
           <p className="text-xs md:text-sm uppercase tracking-widest text-neutral-500 max-w-md font-medium">
-            Ouvert aux stages 2026 · Gisenyi, Rwanda
+            {t.hero.badge}
           </p>
         </div>
 
         {/* Massive Typography with floating labels */}
         <div className="group relative pb-10">
           <div className="animate-on-scroll hidden lg:flex bg-neutral-900 z-20 border-neutral-700 border rounded-full px-5 py-2 absolute top-[0%] left-[38%] -top-4 shadow-sm gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="fade" data-delay="800">
-            <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">Remote Friendly</span>
+            <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">{t.hero.remoteLabel}</span>
           </div>
           <div className="animate-on-scroll hidden lg:flex bg-neutral-900 z-20 border-neutral-700 border rounded-full px-5 py-2 absolute top-[45%] right-[0%] shadow-sm gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="right" data-delay="900">
             <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">ULK 2027</span>
           </div>
           <div className="animate-on-scroll hidden lg:flex z-20 gap-2 text-neutral-950 bg-emerald-400 rounded-full px-5 py-2 absolute top-[55%] left-[5%] shadow-lg gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="left" data-delay="1000">
-            <span className="text-[0.65rem] font-bold uppercase tracking-widest">Full-Stack</span>
+            <span className="text-[0.65rem] font-bold uppercase tracking-widest">{t.hero.fullstackLabel}</span>
           </div>
           <h1 className="text-[16vw] md:text-[14vw] lg:text-[12rem] leading-[0.8] uppercase select-none md:text-left font-medium text-white tracking-tighter font-oswald text-center mix-blend-normal max-w-4xl">
             <span className="animate-on-scroll inline-block" data-animation="up" data-delay="400">Your</span>
@@ -306,12 +320,12 @@ function App() {
       <div className="z-20 flex flex-col lg:flex-row gap-12 mt-8 relative gap-x-12 gap-y-12 items-end justify-between">
         <div className="flex flex-col gap-6 max-w-lg">
           <div className="animate-on-scroll flex items-center gap-3 text-xs font-bold tracking-widest uppercase text-neutral-500" data-animation="up" data-delay="700">
-            <span>Ingénierie Logicielle</span>
+            <span>{t.hero.subtitle1}</span>
             <span className="w-4 h-[1px] bg-neutral-600 inline-block"></span>
-            <span>Architecture Business</span>
+            <span>{t.hero.subtitle2}</span>
           </div>
           <p className="animate-on-scroll text-sm md:text-base text-neutral-400 leading-relaxed font-normal uppercase tracking-wide" data-animation="up" data-delay="800">
-            Étudiant en Software Engineering à l'ULK (Kigali). Je conçois des solutions numériques avec une vision stratégique.
+            {t.hero.description}
           </p>
           <div className="flex flex-wrap gap-3 items-center">
             <a
@@ -328,7 +342,7 @@ function App() {
                 <div className="absolute inset-0 bg-gradient-to-b from-neutral-800/60 to-transparent"></div>
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-1/2 bg-blue-500/10 blur-2xl rounded-full transition-colors duration-500 group-hover:bg-blue-500/30"></div>
               </div>
-              <span className="relative z-10 text-white/90 group-hover:text-white">Me Contacter</span>
+              <span className="relative z-10 text-white/90 group-hover:text-white">{t.hero.cta}</span>
               <iconify-icon icon="solar:arrow-right-bold-duotone" class="relative z-10 ml-2 transition-transform duration-300 group-hover:translate-x-1" style={{fontSize:'1rem'}}></iconify-icon>
             </a>
             <a
@@ -339,7 +353,7 @@ function App() {
               data-animation="up"
               data-delay="1000"
             >
-              Voir GitHub
+              {t.hero.github}
             </a>
           </div>
         </div>
@@ -366,8 +380,8 @@ function App() {
                 })}
               </div>
             </div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-1">Stack Tech</h3>
-            <p className="text-[0.65rem] leading-normal opacity-70 uppercase">5+ Technologies.</p>
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-1">{t.hero.cardStack}</h3>
+            <p className="text-[0.65rem] leading-normal opacity-70 uppercase">{t.hero.cardStackSub}</p>
           </div>
 
           {/* Card: Projets */}
@@ -390,8 +404,8 @@ function App() {
                 })}
               </div>
             </div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-1">Projets</h3>
-            <p className="text-[0.65rem] leading-normal opacity-70 uppercase">Open Source.</p>
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-1">{t.hero.cardProjects}</h3>
+            <p className="text-[0.65rem] leading-normal opacity-70 uppercase">{t.hero.cardProjectsSub}</p>
           </div>
 
           {/* Card: Contact */}
@@ -414,8 +428,8 @@ function App() {
                 })}
               </div>
             </div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-1">Contact</h3>
-            <p className="text-[0.65rem] leading-normal opacity-70 uppercase">Disponible.</p>
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-1">{t.hero.cardContact}</h3>
+            <p className="text-[0.65rem] leading-normal opacity-70 uppercase">{t.hero.cardContactSub}</p>
           </div>
         </div>
       </div>
@@ -424,10 +438,10 @@ function App() {
       <div id="expertise" className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-x-16 gap-y-16">
         <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
           <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="0">
-            Mon <span className="text-neutral-600">Expertise</span> Spécialisée
+            {t.expertise.title} <span className="text-neutral-600">{t.expertise.titleAccent}</span> {t.expertise.titleEnd}
           </h2>
           <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="100">
-            Réduire l'écart entre la précision technique et la croissance business.
+            {t.expertise.subtitle}
           </p>
         </div>
 
@@ -439,8 +453,8 @@ function App() {
               <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center mb-2 border border-neutral-700" style={{boxShadow:'0 0 15px -3px rgba(52,211,153,0.3)'}}>
                 <iconify-icon icon="solar:code-square-bold-duotone" class="text-emerald-400" style={{fontSize:'1.5rem'}}></iconify-icon>
               </div>
-              <h3 className="uppercase text-2xl font-semibold text-white tracking-tight font-bricolage">Ingénierie d'Application</h3>
-              <p className="text-neutral-400 text-sm leading-relaxed max-w-xs font-space">Architecture de systèmes robustes et évolutifs. Je transforme des concepts complexes en solutions logicielles fluides.</p>
+              <h3 className="uppercase text-2xl font-semibold text-white tracking-tight font-bricolage">{t.expertise.card1Title}</h3>
+              <p className="text-neutral-400 text-sm leading-relaxed max-w-xs font-space">{t.expertise.card1Desc}</p>
               <div className="flex items-center gap-3 text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500 mt-2">
                 <span className="bg-neutral-800 px-3 py-1 rounded-full border border-neutral-700">Full-Stack</span>
                 <span className="w-8 h-[1px] bg-neutral-700 inline-block"></span>
@@ -494,14 +508,14 @@ function App() {
               <div className="flex bg-neutral-800 w-12 h-12 border-neutral-700 border rounded-full mb-2 items-center justify-center">
                 <iconify-icon icon="solar:layers-bold-duotone" class="text-blue-400" style={{fontSize:'1.5rem'}}></iconify-icon>
               </div>
-              <h3 className="uppercase text-2xl font-semibold text-white tracking-tight font-bricolage">Expertise Blockchain</h3>
-              <p className="text-neutral-400 text-sm leading-relaxed max-w-xs font-space">Développement Web3 & Smart Contracts. Sécurisation et transparence des données décentralisées.</p>
+              <h3 className="uppercase text-2xl font-semibold text-white tracking-tight font-bricolage">{t.expertise.card2Title}</h3>
+              <p className="text-neutral-400 text-sm leading-relaxed max-w-xs font-space">{t.expertise.card2Desc}</p>
             </div>
             <div className="relative z-10 flex-1 w-full bg-neutral-950 border border-neutral-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 overflow-hidden group-hover:border-neutral-700/50 transition-colors">
               <div className="flex items-center justify-between border-b border-neutral-800 pb-4 mb-2">
                 <div className="flex items-center gap-2">
                   <iconify-icon icon="solar:shield-check-bold-duotone" class="text-neutral-400" style={{fontSize:'1rem'}}></iconify-icon>
-                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-300">Smart Contract Deploy</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-300">{t.expertise.card2Deploy}</span>
                 </div>
                 <span className="bg-blue-900/20 text-blue-300 border border-blue-800/50 text-[0.6rem] font-bold uppercase tracking-wider px-2 py-1 rounded">Solidity</span>
               </div>
@@ -540,7 +554,7 @@ function App() {
               </div>
               <button className="mt-2 flex items-center gap-2 text-neutral-500 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors w-max py-2">
                 <iconify-icon icon="solar:add-circle-bold-duotone" style={{fontSize:'1rem'}}></iconify-icon>
-                <span>Voir Projets Web3</span>
+                <span>{t.expertise.card2ViewWeb3}</span>
               </button>
             </div>
           </div>
@@ -549,8 +563,8 @@ function App() {
         {/* Cards 3 & 4 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
-            { id:'info', icon:'solar:monitor-bold-duotone', color:'#818cf8', glow:'rgba(99,102,241,0.1)', title:'Informatique en Gestion', desc:"Systèmes ERP/CRM. Optimisation des processus métiers par l'intégration technologique.", tags:['ERP','CRM','Audit Digital'], delay:'400' },
-            { id:'strat', icon:'solar:chart-2-bold-duotone', color:'#c084fc', glow:'rgba(168,85,247,0.1)', title:'Analyse Stratégique', desc:'Structure Business, ROI, Optimisation Processus, Stratégie Tech.', tags:['Business','ROI','Stratégie'], delay:'500' },
+            { id:'info', icon:'solar:monitor-bold-duotone', color:'#818cf8', glow:'rgba(99,102,241,0.1)', title:t.expertise.card3Title, desc:t.expertise.card3Desc, tags:['ERP','CRM','Audit Digital'], delay:'400' },
+            { id:'strat', icon:'solar:chart-2-bold-duotone', color:'#c084fc', glow:'rgba(168,85,247,0.1)', title:t.expertise.card4Title, desc:t.expertise.card4Desc, tags:['Business','ROI','Stratégie'], delay:'500' },
           ].map(({ id, icon, color, glow, title, desc, tags, delay }) => (
             <div key={id} className="animate-on-scroll group relative bg-neutral-900 border border-neutral-800 rounded-[2rem] p-8 overflow-hidden hover:border-neutral-700 transition-all duration-500" data-animation="up" data-delay={delay}>
               <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{background:glow}}></div>
@@ -574,13 +588,13 @@ function App() {
         <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
           <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
             <iconify-icon icon="solar:code-bold-duotone" class="text-emerald-400" style={{fontSize:'0.75rem'}}></iconify-icon>
-            <span>Open Source</span>
+            <span>{t.projects.badge}</span>
           </div>
           <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
-            Projets <span className="text-neutral-600">GitHub</span>
+            {t.projects.title} <span className="text-neutral-600">{t.projects.titleAccent}</span>
           </h2>
           <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
-            Contributions open-source, de la cybersécurité à la gestion.
+            {t.projects.subtitle}
           </p>
         </div>
 
@@ -660,7 +674,7 @@ function App() {
                   className="group flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 hover:border-neutral-600 transition-all duration-300"
                 >
                   <iconify-icon icon="solar:code-square-bold-duotone" class="text-emerald-400" style={{fontSize:'1rem'}}></iconify-icon>
-                  {showAllRepos ? 'Voir moins' : `Voir les ${repos.length - 4} autres projets`}
+                  {showAllRepos ? t.projects.showLess : t.projects.showMore(repos.length - 4)}
                   <iconify-icon
                     icon="solar:alt-arrow-down-bold-duotone"
                     class="text-neutral-500 group-hover:text-white transition-all duration-300"
@@ -693,20 +707,20 @@ function App() {
           if (firstDay) {
             const d = new Date(firstDay.date);
             if (d.getDate() <= 7) {
-              months.push({ label: d.toLocaleString('fr-FR', { month: 'short' }), weekIndex: wi });
+              months.push({ label: d.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', { month: 'short' }), weekIndex: wi });
             }
           }
         });
-        const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+        const days = lang === 'fr' ? ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         return (
           <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-8">
             <div className="flex flex-col items-center text-center gap-4 max-w-3xl mx-auto">
               <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
                 <iconify-icon icon="solar:graph-bold-duotone" class="text-emerald-400" style={{fontSize:'0.75rem'}}></iconify-icon>
-                <span>Activité GitHub</span>
+                <span>{t.contributions.badge}</span>
               </div>
               <h2 className="animate-on-scroll md:text-4xl lg:text-5xl uppercase leading-[0.9] text-2xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
-                <span className="text-emerald-400">{total.toLocaleString()}</span> contributions <span className="text-neutral-600">cette année</span>
+                <span className="text-emerald-400">{t.contributions.title(total)}</span> <span className="text-neutral-600">{t.contributions.titleAccent}</span>
               </h2>
             </div>
             <div className="animate-on-scroll overflow-x-auto flex justify-center" data-animation="up" data-delay="150">
@@ -749,11 +763,11 @@ function App() {
               </div>
               {/* Legend */}
               <div className="flex items-center justify-end gap-2 mt-3 pr-2">
-                <span className="text-[0.6rem] text-neutral-600 uppercase tracking-wider">Moins</span>
+                <span className="text-[0.6rem] text-neutral-600 uppercase tracking-wider">{t.contributions.less}</span>
                 {['#161616','#0d4429','#006d32','#26a641','#39d353'].map(c => (
                   <div key={c} className="w-3 h-3 rounded-[2px]" style={{background:c, border:'1px solid rgba(255,255,255,0.04)'}}></div>
                 ))}
-                <span className="text-[0.6rem] text-neutral-600 uppercase tracking-wider">Plus</span>
+                <span className="text-[0.6rem] text-neutral-600 uppercase tracking-wider">{t.contributions.more}</span>
               </div>
             </div>
           </div>
@@ -769,17 +783,17 @@ function App() {
             <div className="relative z-10 flex flex-col gap-8">
               <div className="flex items-center gap-4">
                 <span className="h-px w-8 bg-emerald-500/50 inline-block"></span>
-                <span className="text-emerald-400 text-xs font-bold tracking-[0.2em] uppercase font-space">Parcours</span>
+                <span className="text-emerald-400 text-xs font-bold tracking-[0.2em] uppercase font-space">{t.parcours.badge}</span>
               </div>
               <h2 className="animate-on-scroll text-4xl md:text-5xl font-medium text-white tracking-tight font-bricolage leading-[1.1]" data-animation="left" data-delay="0">
-                Mon évolution,{' '}
-                <span className="text-neutral-500">Simplifiée.</span>
+                {t.parcours.title}{' '}
+                <span className="text-neutral-500">{t.parcours.titleAccent}</span>
               </h2>
               <p className="animate-on-scroll text-neutral-400 text-sm md:text-base leading-relaxed font-space max-w-md" data-animation="left" data-delay="100">
-                De la gestion commerciale vers l'ingénierie logicielle avancée à l'ULK (Kigali).
+                {t.parcours.description}
               </p>
               <a href="/peterCv.pdf" download className="mt-4 group flex items-center gap-3 text-sm font-medium text-white w-max">
-                <span className="border-b border-emerald-500 pb-0.5 group-hover:border-white transition-colors">Voir CV complet</span>
+                <span className="border-b border-emerald-500 pb-0.5 group-hover:border-white transition-colors">{t.parcours.viewCV}</span>
                 <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-emerald-400 group-hover:translate-x-1 transition-transform" style={{fontSize:'1rem'}}></iconify-icon>
               </a>
             </div>
@@ -787,12 +801,7 @@ function App() {
 
           <div className="lg:col-span-7 bg-white text-neutral-950 rounded-[2.5rem] p-8 md:p-16 flex flex-col justify-between gap-12 relative overflow-hidden">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-100 rounded-full blur-[80px] opacity-60 pointer-events-none"></div>
-            {[
-              { period:'2023–2027', title:'ULK — Ingénierie Logicielle', subtitle:'Kigali · Architecture Système · Présent' },
-              { period:'2021–2023', title:'Support Technique & Systèmes', subtitle:'Maintenance · Optimisation · Expérience' },
-              { period:'Avant 2021', title:'Diplôme Commercial & Gestion', subtitle:'Économie · Comptabilité · Fondation' },
-              { period:'2026', title:'Stage Ingénierie Logicielle', subtitle:'Objectif · Disponible · Ouvert' },
-            ].map(({ period, title, subtitle }, i, arr) => (
+            {t.parcours.milestones.map(({ period, title, subtitle }, i, arr) => (
               <React.Fragment key={title}>
                 <div className="animate-on-scroll flex flex-col sm:flex-row gap-6 sm:gap-12 items-start sm:items-center relative z-10 group" data-animation="up" data-delay={String(i * 100)}>
                   <span className="text-6xl md:text-7xl font-medium tracking-tighter font-bricolage w-48 shrink-0 group-hover:scale-105 transition-transform duration-500 origin-left">{period}</span>
@@ -813,13 +822,13 @@ function App() {
         <div className="flex flex-col items-center gap-6 max-w-3xl">
           <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
             <iconify-icon icon="solar:star-bold-duotone" class="text-emerald-400" style={{fontSize:'0.75rem'}}></iconify-icon>
-            <span>Ouvert aux Opportunités Professionnelles</span>
+            <span>{t.contact.badge}</span>
           </div>
           <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
-            Bâtissons la <span className="text-neutral-600">Prochaine</span> Grande Solution
+            {t.contact.title1} <span className="text-neutral-600">{t.contact.titleAccent}</span> {t.contact.title2}
           </h2>
           <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
-            Je recherche activement mon Stage 2026. Étudiant en Software Engineering à l'ULK, basé à Gisenyi (Rwanda) / Goma (RDC).
+            {t.contact.description}
           </p>
           <div className="animate-on-scroll flex flex-wrap justify-center gap-4" data-animation="up" data-delay="200">
             <a href="mailto:peter23xp@gmail.com" className="group flex items-center gap-2 overflow-hidden uppercase transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.5)] text-sm font-medium text-white tracking-widest rounded-full pt-5 pr-10 pb-5 pl-10 relative">
@@ -832,7 +841,7 @@ function App() {
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-1/2 bg-blue-500/10 blur-2xl rounded-full group-hover:bg-blue-500/30 transition-colors"></div>
               </div>
               <iconify-icon icon="solar:letter-bold-duotone" class="relative z-10 text-blue-400" style={{fontSize:'1rem'}}></iconify-icon>
-              <span className="relative z-10">M'envoyer un Email</span>
+              <span className="relative z-10">{t.contact.email}</span>
             </a>
             <a href="https://www.linkedin.com/in/peter-akilimali-1a7016282/" target="_blank" rel="noopener noreferrer" className="animate-on-scroll px-6 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2" data-animation="up" data-delay="250">
               <iconify-icon icon="simple-icons:linkedin" class="text-blue-400" style={{fontSize:'1rem'}}></iconify-icon>
@@ -840,11 +849,11 @@ function App() {
             </a>
             <a href="https://wa.me/243902238740" target="_blank" rel="noopener noreferrer" className="animate-on-scroll px-6 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2" data-animation="up" data-delay="300">
               <iconify-icon icon="solar:chat-round-bold-duotone" class="text-emerald-400" style={{fontSize:'1rem'}}></iconify-icon>
-              WhatsApp
+              {t.contact.whatsapp}
             </a>
             <a href="/peterCv.pdf" download className="animate-on-scroll px-6 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2" data-animation="up" data-delay="350">
               <iconify-icon icon="solar:download-bold-duotone" class="text-orange-400" style={{fontSize:'1rem'}}></iconify-icon>
-              CV PDF
+              {t.contact.cvPdf}
             </a>
           </div>
         </div>
@@ -858,7 +867,7 @@ function App() {
             <div className="flex flex-col gap-6">
               <a href="#" className="text-2xl font-bold tracking-tight text-white">Peter<span className="text-indigo-400">.</span></a>
               <p className="text-neutral-400 text-sm leading-relaxed max-w-xs font-space">
-                Ingénieur Logiciel & Architecte Business. Lier rigueur technique et valeur commerciale stratégique.
+                {t.footer.tagline}
               </p>
               <div className="flex items-center gap-4 mt-2">
                 {[
@@ -873,28 +882,28 @@ function App() {
               </div>
             </div>
             <div className="flex flex-col gap-4">
-              <h4 className="text-white font-semibold text-sm uppercase tracking-widest mb-2">Navigation</h4>
-              {[['#projets','Projets'],['#expertise','Expertise'],['#parcours','Parcours'],['#contact','Contact']].map(([href,label]) => (
+              <h4 className="text-white font-semibold text-sm uppercase tracking-widest mb-2">{t.footer.nav}</h4>
+              {t.footer.navLinks.map(([href,label]) => (
                 <a key={href} href={href} className="text-neutral-400 hover:text-emerald-400 text-sm transition-colors w-max">{label}</a>
               ))}
             </div>
             <div className="flex flex-col gap-4">
-              <h4 className="text-white font-semibold text-sm uppercase tracking-widest mb-2">Stack</h4>
-              {['React / Next.js','Node.js','PostgreSQL / MySQL','Solidity / Web3'].map(t => (
-                <span key={t} className="text-neutral-400 text-sm">{t}</span>
+              <h4 className="text-white font-semibold text-sm uppercase tracking-widest mb-2">{t.footer.stack}</h4>
+              {['React / Next.js','Node.js','PostgreSQL / MySQL','Solidity / Web3'].map(item => (
+                <span key={item} className="text-neutral-400 text-sm">{item}</span>
               ))}
             </div>
             <div className="flex flex-col gap-4">
-              <h4 className="text-white font-semibold text-sm uppercase tracking-widest mb-2">Stage 2026</h4>
+              <h4 className="text-white font-semibold text-sm uppercase tracking-widest mb-2">{t.footer.stage}</h4>
               <div className="p-6 rounded-3xl bg-neutral-900 border border-neutral-800 relative overflow-hidden">
                 <div className="flex items-center gap-2 text-emerald-400 font-black text-[0.65rem] mb-3 uppercase tracking-widest">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  Disponible
+                  {t.footer.stageAvailable}
                 </div>
-                <p className="text-xs text-neutral-400 leading-relaxed font-medium">Prêt à déployer des solutions techniques.</p>
+                <p className="text-xs text-neutral-400 leading-relaxed font-medium">{t.footer.stageDesc}</p>
               </div>
             </div>
           </div>
@@ -906,7 +915,7 @@ function App() {
               <iconify-icon icon="simple-icons:ethereum" class="text-white" style={{fontSize:'1.5rem'}}></iconify-icon>
             </div>
             <p className="text-neutral-600 text-xs font-medium uppercase tracking-wider">
-              &copy; 2025 Peter Akilimali · Gisenyi, Rwanda / Goma, RDC
+              {t.footer.copyright}
             </p>
           </div>
         </div>
@@ -919,7 +928,7 @@ function App() {
 
       {/* README Modal */}
       {readmeRepo && (
-        <RepoModal repo={readmeRepo} onClose={() => setReadmeRepo(null)} />
+        <RepoModal repo={readmeRepo} onClose={() => setReadmeRepo(null)} lang={lang} />
       )}
     </main>
   );
