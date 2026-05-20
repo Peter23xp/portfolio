@@ -788,7 +788,7 @@ function App() {
           <div className="lg:col-span-7 bg-white text-neutral-950 rounded-[2.5rem] p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-100 rounded-full blur-[80px] opacity-60 pointer-events-none"></div>
             {[
-              { icon:'solar:graduation-cap-bold-duotone', iconColor:'#4ade80', period:'2023–2027', title:'ULK — Ingénierie Logicielle', subtitle:'Kigali · Architecture Système', badgeBg:'#f0fdf4', badgeBorder:'#bbf7d0', badgeColor:'#15803d', badgeText:'Présent', pulse:false },
+              { icon:'solar:diploma-bold-duotone', iconColor:'#4ade80', period:'2023–2027', title:'ULK — Ingénierie Logicielle', subtitle:'Kigali · Architecture Système', badgeBg:'#f0fdf4', badgeBorder:'#bbf7d0', badgeColor:'#15803d', badgeText:'Présent', pulse:false },
               { icon:'solar:cpu-bolt-bold-duotone', iconColor:'#60a5fa', period:'2021–2023', title:'Support Technique & Systèmes', subtitle:'Maintenance · Optimisation', badgeBg:'#eff6ff', badgeBorder:'#bfdbfe', badgeColor:'#1d4ed8', badgeText:'Expérience', pulse:false },
               { icon:'solar:chart-2-bold-duotone', iconColor:'#c084fc', period:'Avant 2021', title:'Diplôme — Commercial & Gestion', subtitle:'Économie · Comptabilité', badgeBg:'#faf5ff', badgeBorder:'#e9d5ff', badgeColor:'#7e22ce', badgeText:'Fondation', pulse:false },
               { icon:'solar:rocket-bold-duotone', iconColor:'#fb923c', period:'2026', title:'Stage Ingénierie Logicielle', subtitle:'Objectif · Disponible', badgeBg:'#fff7ed', badgeBorder:'#fed7aa', badgeColor:'#c2410c', badgeText:'Ouvert', pulse:true },
