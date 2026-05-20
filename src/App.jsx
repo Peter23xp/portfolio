@@ -105,11 +105,6 @@ function App() {
       <div className="z-10 flex-grow flex flex-col md:py-0 pt-10 pb-10 relative justify-center">
         {/* Badge */}
         <div className="animate-on-scroll flex md:mb-4 md:mt-12 mt-4 mb-6 gap-x-4 gap-y-4 items-center" data-animation="up" data-delay="300">
-          <div className="flex -space-x-2">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&crop=face" className="w-8 h-8 rounded-full border-2 border-neutral-900" alt="" />
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" className="w-8 h-8 rounded-full border-2 border-neutral-900" alt="" />
-            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" className="w-8 h-8 rounded-full border-2 border-neutral-900" alt="" />
-          </div>
           <p className="text-xs md:text-sm uppercase tracking-widest text-neutral-500 max-w-md font-medium">
             Ouvert aux stages 2026 · Gisenyi, Rwanda
           </p>
