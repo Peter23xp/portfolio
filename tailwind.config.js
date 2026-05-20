@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        space: ['"IBM Plex Sans"', 'sans-serif'],
-        oswald: ['"Syne"', 'sans-serif'],
+        space: ['"Satoshi"', 'sans-serif'],
+        oswald: ['"Clash Display"', 'sans-serif'],
         bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
       },
     },
