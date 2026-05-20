@@ -151,6 +151,7 @@ function App() {
   const [readmeRepo, setReadmeRepo] = useState(null);
   const [commitCounts, setCommitCounts] = useState({});
   const [contributions, setContributions] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
@@ -231,7 +232,7 @@ function App() {
       <img
         src="/peter.jpeg"
         alt="Peter Akilimali"
-        className="w-1/2 h-[960px] object-cover object-top rounded-[40px] absolute top-4 right-4 bottom-0 pointer-events-none"
+        className="w-1/3 md:w-1/2 h-[960px] object-cover object-top rounded-[40px] absolute top-4 right-4 bottom-0 pointer-events-none opacity-40 md:opacity-100"
       />
 
       {/* Background gradient */}
@@ -247,52 +248,81 @@ function App() {
       </div>
 
       {/* ===== NAV ===== */}
-      <nav className="z-20 flex flex-wrap gap-6 md:mb-0 mix-blend-plus-lighter mb-12 relative gap-x-6 gap-y-6 items-center justify-between">
-        <div className="animate-on-scroll flex items-center group cursor-pointer" data-animation="left" data-delay="0">
-          <iconify-icon icon="solar:code-bold-duotone" class="text-white group-hover:rotate-[22.5deg] transition-transform duration-500 ease-out" style={{fontSize:'2.5rem'}}></iconify-icon>
+      <nav className="z-20 relative mb-12 md:mb-0">
+        <div className="mix-blend-plus-lighter flex gap-x-6 gap-y-6 items-center justify-between">
+          <div className="animate-on-scroll flex items-center group cursor-pointer" data-animation="left" data-delay="0">
+            <iconify-icon icon="solar:code-bold-duotone" class="text-white group-hover:rotate-[22.5deg] transition-transform duration-500 ease-out" style={{fontSize:'2.5rem'}}></iconify-icon>
+          </div>
+          <div className="hidden md:flex items-center gap-12 text-xs font-medium tracking-widest uppercase text-neutral-400">
+            <a href="#projets" className="animate-on-scroll hover:text-white transition-colors flex items-center gap-2" data-animation="up" data-delay="100">
+              <div className="w-2 h-2 rounded-full bg-white"></div>{t.nav.projects}
+            </a>
+            <a href="#expertise" className="animate-on-scroll hover:text-white transition-colors flex items-center gap-2" data-animation="up" data-delay="150">
+              <div className="w-2 h-2 rounded-full border border-neutral-600"></div>{t.nav.expertise}
+            </a>
+            <a href="#parcours" className="animate-on-scroll hover:text-white transition-colors mix-blend-hard-light" data-animation="up" data-delay="200">{t.nav.parcours}</a>
+            <a href="#contact" className="animate-on-scroll hover:text-white transition-colors" data-animation="up" data-delay="250">{t.nav.contact}</a>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
+              className="animate-on-scroll hidden md:flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all"
+              data-animation="right"
+              data-delay="50"
+            >
+              <iconify-icon icon="solar:global-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
+              {lang === 'fr' ? 'EN' : 'FR'}
+            </button>
+            <a
+              href="/peterCv.pdf"
+              download
+              className="animate-on-scroll hidden uppercase hover:bg-neutral-800 transition-colors md:flex text-xs font-semibold tracking-widest bg-gradient-to-br from-white/10 to-white/0 rounded-full px-6 py-3"
+              data-animation="right"
+              data-delay="100"
+              style={{ position: 'relative', '--border-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))', '--border-radius-before': '9999px' }}
+            >
+              {t.nav.cv}
+            </a>
+            <button
+              className="md:hidden p-3 rounded-full bg-white text-neutral-950"
+              onClick={() => setMobileMenuOpen(o => !o)}
+            >
+              <iconify-icon icon={mobileMenuOpen ? 'solar:close-circle-bold-duotone' : 'solar:hamburger-menu-bold-duotone'} style={{fontSize:'1.25rem'}}></iconify-icon>
+            </button>
+          </div>
         </div>
-        <div className="hidden md:flex items-center gap-12 text-xs font-medium tracking-widest uppercase text-neutral-400">
-          <a href="#projets" className="animate-on-scroll hover:text-white transition-colors flex items-center gap-2" data-animation="up" data-delay="100">
-            <div className="w-2 h-2 rounded-full bg-white"></div>{t.nav.projects}
-          </a>
-          <a href="#expertise" className="animate-on-scroll hover:text-white transition-colors flex items-center gap-2" data-animation="up" data-delay="150">
-            <div className="w-2 h-2 rounded-full border border-neutral-600"></div>{t.nav.expertise}
-          </a>
-          <a href="#parcours" className="animate-on-scroll hover:text-white transition-colors mix-blend-hard-light" data-animation="up" data-delay="200">{t.nav.parcours}</a>
-          <a href="#contact" className="animate-on-scroll hover:text-white transition-colors" data-animation="up" data-delay="250">{t.nav.contact}</a>
-        </div>
-        <div className="flex items-center gap-4">
-          {/* Language switcher */}
-          <button
-            onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-            className="animate-on-scroll hidden md:flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all"
-            data-animation="right"
-            data-delay="50"
-          >
-            <iconify-icon icon="solar:global-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
-            {lang === 'fr' ? 'EN' : 'FR'}
-          </button>
-          <a
-            href="/peterCv.pdf"
-            download
-            className="animate-on-scroll hidden uppercase hover:bg-neutral-800 transition-colors md:flex text-xs font-semibold tracking-widest bg-gradient-to-br from-white/10 to-white/0 rounded-full px-6 py-3"
-            data-animation="right"
-            data-delay="100"
-            style={{ position: 'relative', '--border-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))', '--border-radius-before': '9999px' }}
-          >
-            {t.nav.cv}
-          </a>
-          <button className="md:hidden p-3 rounded-full bg-white text-neutral-950">
-            <iconify-icon icon="solar:hamburger-menu-bold-duotone" style={{fontSize:'1.25rem'}}></iconify-icon>
-          </button>
-        </div>
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-neutral-950/95 backdrop-blur-xl border border-neutral-800 rounded-2xl p-6 flex flex-col gap-4 z-50">
+            <a href="#projets" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium tracking-widest uppercase text-neutral-300 hover:text-white transition-colors flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-white"></div>{t.nav.projects}
+            </a>
+            <a href="#expertise" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium tracking-widest uppercase text-neutral-300 hover:text-white transition-colors flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full border border-neutral-600"></div>{t.nav.expertise}
+            </a>
+            <a href="#parcours" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium tracking-widest uppercase text-neutral-300 hover:text-white transition-colors">{t.nav.parcours}</a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium tracking-widest uppercase text-neutral-300 hover:text-white transition-colors">{t.nav.contact}</a>
+            <div className="flex items-center gap-3 pt-2 border-t border-neutral-800">
+              <button
+                onClick={() => { setLang(l => l === 'fr' ? 'en' : 'fr'); setMobileMenuOpen(false); }}
+                className="flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white transition-all"
+              >
+                <iconify-icon icon="solar:global-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
+                {lang === 'fr' ? 'EN' : 'FR'}
+              </button>
+              <a href="/peterCv.pdf" download onClick={() => setMobileMenuOpen(false)} className="text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white transition-all">
+                {t.nav.cv}
+              </a>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ===== HERO CONTENT ===== */}
       <div className="z-10 flex-grow flex flex-col md:py-0 pt-10 pb-10 relative justify-center">
         {/* Badge */}
         <div className="animate-on-scroll flex md:mb-4 md:mt-12 mt-4 mb-6 gap-x-4 gap-y-4 items-center" data-animation="up" data-delay="300">
-          <p className="text-xs md:text-sm uppercase tracking-widest text-neutral-500 max-w-md font-medium">
+          <p className="text-xs md:text-sm uppercase tracking-widest text-neutral-300 md:text-neutral-500 max-w-md font-medium">
             {t.hero.badge}
           </p>
         </div>
@@ -319,12 +349,12 @@ function App() {
       {/* ===== HERO BOTTOM: Description + CTA + Feature Cards ===== */}
       <div className="z-20 flex flex-col lg:flex-row gap-12 mt-8 relative gap-x-12 gap-y-12 items-end justify-between">
         <div className="flex flex-col gap-6 max-w-lg">
-          <div className="animate-on-scroll flex items-center gap-3 text-xs font-bold tracking-widest uppercase text-neutral-500" data-animation="up" data-delay="700">
+          <div className="animate-on-scroll flex items-center gap-3 text-xs font-bold tracking-widest uppercase text-neutral-300 md:text-neutral-500" data-animation="up" data-delay="700">
             <span>{t.hero.subtitle1}</span>
-            <span className="w-4 h-[1px] bg-neutral-600 inline-block"></span>
+            <span className="w-4 h-[1px] bg-neutral-500 md:bg-neutral-600 inline-block"></span>
             <span>{t.hero.subtitle2}</span>
           </div>
-          <p className="animate-on-scroll text-sm md:text-base text-neutral-400 leading-relaxed font-normal uppercase tracking-wide" data-animation="up" data-delay="800">
+          <p className="animate-on-scroll text-sm md:text-base text-neutral-200 md:text-neutral-400 leading-relaxed font-normal uppercase tracking-wide" data-animation="up" data-delay="800">
             {t.hero.description}
           </p>
           <div className="flex flex-wrap gap-3 items-center">
@@ -447,7 +477,7 @@ function App() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {/* Card 1: Ingénierie d'Application */}
-          <div className="animate-on-scroll group relative bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-8 md:p-12 overflow-hidden flex flex-col h-[600px] hover:border-neutral-700 transition-all duration-500" data-animation="left" data-delay="200">
+          <div className="animate-on-scroll group relative bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-8 md:p-12 overflow-hidden flex flex-col min-h-[420px] sm:h-[600px] hover:border-neutral-700 transition-all duration-500" data-animation="left" data-delay="200">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#171717_1px,transparent_1px),linear-gradient(to_bottom,#171717_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
             <div className="relative z-10 flex flex-col gap-4 mb-12">
               <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center mb-2 border border-neutral-700" style={{boxShadow:'0 0 15px -3px rgba(52,211,153,0.3)'}}>
@@ -479,19 +509,19 @@ function App() {
                     <iconify-icon icon="solar:cpu-bold-duotone" class="text-emerald-400" style={{fontSize:'1.5rem'}}></iconify-icon>
                   </div>
                 </div>
-                <div className="transition-transform duration-700 hover:-translate-y-2 absolute" style={{top:'20%',left:'10%',transform:'translate(-50%, -250%)'}}>
+                <div className="hidden sm:block transition-transform duration-700 hover:-translate-y-2 absolute" style={{top:'20%',left:'10%',transform:'translate(-50%, -250%)'}}>
                   <div className="flex items-center gap-2 bg-neutral-800/90 backdrop-blur-md border border-neutral-700 pr-4 pl-3 py-2 rounded-full shadow-xl hover:border-blue-500/50 transition-all cursor-pointer">
                     <iconify-icon icon="simple-icons:react" class="text-blue-400" style={{fontSize:'1rem'}}></iconify-icon>
                     <span className="text-xs font-medium text-white">React Native</span>
                   </div>
                 </div>
-                <div className="transition-transform duration-700 delay-100 hover:-translate-y-2 z-10 absolute" style={{top:'27%',right:'10%',transform:'translate(50%, -200%)'}}>
+                <div className="hidden sm:block transition-transform duration-700 delay-100 hover:-translate-y-2 z-10 absolute" style={{top:'27%',right:'10%',transform:'translate(50%, -200%)'}}>
                   <div className="flex items-center gap-2 bg-neutral-800/90 backdrop-blur-md border border-neutral-700 pr-4 pl-3 py-2 rounded-full shadow-xl hover:border-purple-500/50 transition-all cursor-pointer">
                     <iconify-icon icon="solar:database-bold-duotone" class="text-purple-400" style={{fontSize:'1rem'}}></iconify-icon>
                     <span className="text-xs font-medium text-white">PostgreSQL</span>
                   </div>
                 </div>
-                <div className="absolute transition-transform duration-700 delay-200 hover:-translate-y-2 z-10" style={{bottom:'20%',left:'15%',transform:'translate(-50%, 250%)'}}>
+                <div className="hidden sm:block absolute transition-transform duration-700 delay-200 hover:-translate-y-2 z-10" style={{bottom:'20%',left:'15%',transform:'translate(-50%, 250%)'}}>
                   <div className="flex items-center gap-2 bg-neutral-800/90 backdrop-blur-md border border-neutral-700 pr-4 pl-3 py-2 rounded-full shadow-xl hover:border-green-500/50 transition-all cursor-pointer">
                     <iconify-icon icon="solar:server-bold-duotone" class="text-green-400" style={{fontSize:'1rem'}}></iconify-icon>
                     <span className="text-xs font-medium text-white">Node.js</span>
@@ -502,7 +532,7 @@ function App() {
           </div>
 
           {/* Card 2: Blockchain */}
-          <div className="animate-on-scroll group relative bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-8 md:p-12 overflow-hidden flex flex-col h-[600px] hover:border-neutral-700 transition-all duration-500" data-animation="right" data-delay="300">
+          <div className="animate-on-scroll group relative bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-8 md:p-12 overflow-hidden flex flex-col min-h-[420px] sm:h-[600px] hover:border-neutral-700 transition-all duration-500" data-animation="right" data-delay="300">
             <div className="absolute top-0 right-0 w-96 h-96 bg-blue-900/10 rounded-full blur-3xl pointer-events-none"></div>
             <div className="relative z-10 flex flex-col gap-4 mb-10">
               <div className="flex bg-neutral-800 w-12 h-12 border-neutral-700 border rounded-full mb-2 items-center justify-center">
@@ -872,7 +902,7 @@ function App() {
               <div className="flex items-center gap-4 mt-2">
                 {[
                   {href:'https://www.linkedin.com/in/peter-akilimali-1a7016282/',icon:'simple-icons:linkedin'},
-                  {href:'tel:+243998439596',icon:'solar:phone-bold-duotone'},
+                  {href:'tel:+243902238740',icon:'solar:phone-bold-duotone'},
                   {href:'mailto:peter23xp@gmail.com',icon:'solar:letter-bold-duotone'},
                 ].map(({href,icon}) => (
                   <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white transition-all duration-300">
