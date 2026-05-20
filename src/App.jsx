@@ -146,6 +146,7 @@ function App() {
   const [showAllRepos, setShowAllRepos] = useState(false);
   const [readmeRepo, setReadmeRepo] = useState(null);
   const [commitCounts, setCommitCounts] = useState({});
+  const [contributions, setContributions] = useState(null);
 
   useEffect(() => {
     ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
@@ -177,6 +178,21 @@ function App() {
         .catch(() => {});
     });
   }, [repos, showAllRepos]);
+
+  useEffect(() => {
+    const query = `{ user(login: "${GITHUB_USER}") { contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } } } } }`;
+    fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    })
+      .then(r => r.json())
+      .then(d => {
+        const cal = d?.data?.user?.contributionsCollection?.contributionCalendar;
+        if (cal) setContributions(cal);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -656,6 +672,93 @@ function App() {
           </>
         )}
       </div>
+
+      {/* ===== CONTRIBUTION GRAPH ===== */}
+      {contributions && (() => {
+        const weeks = contributions.weeks;
+        const total = contributions.totalContributions;
+        const allCounts = weeks.flatMap(w => w.contributionDays.map(d => d.contributionCount));
+        const maxCount = Math.max(...allCounts, 1);
+        const getColor = (count) => {
+          if (count === 0) return '#161616';
+          const intensity = count / maxCount;
+          if (intensity < 0.25) return '#0d4429';
+          if (intensity < 0.5)  return '#006d32';
+          if (intensity < 0.75) return '#26a641';
+          return '#39d353';
+        };
+        const months = [];
+        weeks.forEach((week, wi) => {
+          const firstDay = week.contributionDays[0];
+          if (firstDay) {
+            const d = new Date(firstDay.date);
+            if (d.getDate() <= 7) {
+              months.push({ label: d.toLocaleString('fr-FR', { month: 'short' }), weekIndex: wi });
+            }
+          }
+        });
+        const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+        return (
+          <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-8">
+            <div className="flex flex-col items-center text-center gap-4 max-w-3xl mx-auto">
+              <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
+                <iconify-icon icon="solar:graph-bold-duotone" class="text-emerald-400" style={{fontSize:'0.75rem'}}></iconify-icon>
+                <span>Activité GitHub</span>
+              </div>
+              <h2 className="animate-on-scroll md:text-4xl lg:text-5xl uppercase leading-[0.9] text-2xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
+                <span className="text-emerald-400">{total.toLocaleString()}</span> contributions <span className="text-neutral-600">cette année</span>
+              </h2>
+            </div>
+            <div className="animate-on-scroll w-full overflow-x-auto" data-animation="up" data-delay="150">
+              <div className="min-w-[700px] flex gap-3 p-6 bg-neutral-900/40 border border-white/5 rounded-[2rem]">
+                {/* Day labels */}
+                <div className="flex flex-col justify-between pt-6 pb-0 gap-0" style={{minWidth:'28px'}}>
+                  {[1,3,5].map(i => (
+                    <span key={i} className="text-[0.55rem] text-neutral-600 uppercase tracking-wider leading-none" style={{height:'13px', lineHeight:'13px'}}>{days[i]}</span>
+                  ))}
+                </div>
+                {/* Grid */}
+                <div className="flex flex-col flex-1 gap-1">
+                  {/* Month labels */}
+                  <div className="flex gap-[3px] mb-1" style={{paddingLeft:'0px'}}>
+                    {weeks.map((_, wi) => {
+                      const month = months.find(m => m.weekIndex === wi);
+                      return (
+                        <div key={wi} style={{width:'13px', flexShrink:0}}>
+                          {month ? <span className="text-[0.55rem] text-neutral-500 uppercase tracking-wider whitespace-nowrap">{month.label}</span> : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Cells */}
+                  <div className="flex gap-[3px]">
+                    {weeks.map((week, wi) => (
+                      <div key={wi} className="flex flex-col gap-[3px]">
+                        {week.contributionDays.map((day, di) => (
+                          <div
+                            key={di}
+                            title={`${day.date} — ${day.contributionCount} contribution${day.contributionCount !== 1 ? 's' : ''}`}
+                            className="rounded-[2px] transition-transform duration-150 hover:scale-125 cursor-default"
+                            style={{width:'13px', height:'13px', background: getColor(day.contributionCount), border: '1px solid rgba(255,255,255,0.04)'}}
+                          ></div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Legend */}
+              <div className="flex items-center justify-end gap-2 mt-3 pr-2">
+                <span className="text-[0.6rem] text-neutral-600 uppercase tracking-wider">Moins</span>
+                {['#161616','#0d4429','#006d32','#26a641','#39d353'].map(c => (
+                  <div key={c} className="w-3 h-3 rounded-[2px]" style={{background:c, border:'1px solid rgba(255,255,255,0.04)'}}></div>
+                ))}
+                <span className="text-[0.6rem] text-neutral-600 uppercase tracking-wider">Plus</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ===== PARCOURS ===== */}
       <div id="parcours" className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
