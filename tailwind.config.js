@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        space: ['"Space Grotesk"', 'sans-serif'],
-        oswald: ['"Oswald"', 'sans-serif'],
+        space: ['"Satoshi"', 'sans-serif'],
+        oswald: ['"Clash Display"', 'sans-serif'],
         bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
       },
     },

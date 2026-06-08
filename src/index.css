@@ -7,7 +7,15 @@
   body {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    font-feature-settings: "kern", "liga";
     @apply flex flex-col xl:items-center xl:justify-center xl:p-8 antialiased text-white font-space bg-neutral-950 pt-0 pr-0 pb-0 pl-0;
+  }
+  .font-oswald {
+    font-feature-settings: "kern";
+    letter-spacing: -0.03em;
+  }
+  .font-bricolage {
+    font-feature-settings: "kern", "liga", "calt";
   }
 }
 
