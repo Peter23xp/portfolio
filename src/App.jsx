@@ -141,6 +141,38 @@ function RepoModal({ repo, onClose, lang }) {
   );
 }
 
+const CUSTOM_PROJECTS = [
+  {
+    id: 'custom-chadito',
+    name: 'Chadito',
+    language: 'React Native',
+    stargazers_count: '★',
+    html_url: 'https://chadito.net',
+    description: 'Solution Complète (Web, iOS, Android)',
+    is_custom: true,
+    ios_link: 'https://apps.apple.com/rw/app/chadito/id6757854742',
+    android_link: 'https://play.google.com/store/apps/details?id=com.chadito.app'
+  },
+  {
+    id: 'custom-progress-business',
+    name: 'Progress Business',
+    language: 'React',
+    stargazers_count: '★',
+    html_url: 'https://progress-business.vercel.app/',
+    description: "Application de gestion d'entreprise (ERP/CRM).",
+    is_custom: true
+  },
+  {
+    id: 'custom-forever-united',
+    name: 'Forever United',
+    language: 'Web',
+    stargazers_count: '★',
+    html_url: 'https://forever-united.vercel.app/',
+    description: 'Plateforme web pour le bénévolat et les œuvres caritatives.',
+    is_custom: true
+  }
+];
+
 function App() {
   const containerRef = useRef(null);
   const [lang, setLang] = useState('fr');
@@ -152,6 +184,71 @@ function App() {
   const [commitCounts, setCommitCounts] = useState({});
   const [contributions, setContributions] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const renderRepoCard = (repo, index) => (
+    <div
+      key={repo.id}
+      className={`animate-on-scroll group relative flex flex-col justify-between h-[420px] bg-neutral-950/40 backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-[2rem] p-8 transition-all duration-500 overflow-hidden ${index % 2 === 0 ? 'animate-levitate' : 'animate-levitate-delayed'} ${index % 2 === 1 ? 'lg:mt-12' : ''}`}
+      data-animation="up"
+      data-delay={String(200 + (index % 4) * 100)}
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      {/* Top row: language + stars */}
+      <div className="flex justify-between items-start z-10 relative">
+        <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500 border border-white/5 px-2 py-1 rounded-md bg-neutral-900/50">
+          {repo.language || 'Code'}
+        </span>
+        <div className="flex items-center gap-1">
+          <iconify-icon icon="solar:star-bold-duotone" class="text-yellow-400" style={{fontSize:'0.875rem'}}></iconify-icon>
+          <span className="text-sm font-medium" style={{color: langColors[repo.language] || '#a3a3a3'}}>
+            {repo.stargazers_count}
+          </span>
+        </div>
+      </div>
+      {/* Center watermark: repo name */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden px-6">
+        <span
+          className="text-white font-bricolage font-bold text-center leading-none select-none transition-all duration-500 opacity-[0.06] group-hover:opacity-[0.14]"
+          style={{fontSize:'clamp(1.5rem, 5vw, 3rem)', wordBreak:'break-word', textAlign:'center', textTransform:'uppercase', letterSpacing:'-0.04em'}}
+        >{repo.name}</span>
+      </div>
+      {/* Bottom: commit count + description + actions */}
+      <div className="z-10 relative flex flex-col gap-2 border-t border-white/5 pt-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-black text-white font-bricolage group-hover:translate-x-1 transition-transform duration-300 leading-none">{repo.is_custom ? 'PRO' : (commitCounts[repo.name] ?? '—')}</span>
+          <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500">{repo.is_custom ? 'LIVRÉ' : 'commits'}</span>
+        </div>
+        <div className="flex items-center justify-between mt-1">
+          <div className="flex items-center gap-3">
+            <a
+              href={repo.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:text-white transition-colors"
+              onClick={e => e.stopPropagation()}
+            >
+              <iconify-icon icon={repo.is_custom ? "solar:global-bold-duotone" : "simple-icons:github"} style={{fontSize:'0.875rem'}}></iconify-icon>
+              {repo.is_custom ? 'Visiter' : 'GitHub'}
+              <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-neutral-600 group-hover:text-white transition-colors" style={{fontSize:'0.75rem'}}></iconify-icon>
+            </a>
+            {repo.ios_link && (
+              <a href={repo.ios_link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-neutral-500 hover:text-white transition-colors" title="Apple App Store"><iconify-icon icon="simple-icons:apple" style={{fontSize:'0.875rem'}}></iconify-icon></a>
+            )}
+            {repo.android_link && (
+              <a href={repo.android_link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-neutral-500 hover:text-white transition-colors" title="Google Play Store"><iconify-icon icon="simple-icons:googleplay" style={{fontSize:'0.875rem'}}></iconify-icon></a>
+            )}
+          </div>
+          <button
+            onClick={() => setReadmeRepo(repo)}
+            className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:text-emerald-400 transition-colors"
+          >
+            <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
+            README
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
@@ -171,6 +268,7 @@ function App() {
   useEffect(() => {
     const visible = showAllRepos ? repos : repos.slice(0, 4);
     visible.forEach(repo => {
+      if (repo.is_custom) return;
       if (commitCounts[repo.name] !== undefined) return; // already fetched
       ghFetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
         .then(r => {
@@ -333,7 +431,7 @@ function App() {
             <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">{t.hero.remoteLabel}</span>
           </div>
           <div className="animate-on-scroll hidden lg:flex bg-neutral-900 z-20 border-neutral-700 border rounded-full px-5 py-2 absolute top-[45%] right-[0%] shadow-sm gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="right" data-delay="900">
-            <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">ULK 2027</span>
+            <span className="text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300">Available</span>
           </div>
           <div className="animate-on-scroll hidden lg:flex z-20 gap-2 text-neutral-950 bg-emerald-400 rounded-full px-5 py-2 absolute top-[55%] left-[5%] shadow-lg gap-x-2 gap-y-2 items-center hover:scale-105 transition-transform cursor-default" data-animation="left" data-delay="1000">
             <span className="text-[0.65rem] font-bold uppercase tracking-widest">{t.hero.fullstackLabel}</span>
@@ -613,8 +711,30 @@ function App() {
         </div>
       </div>
 
-      {/* ===== PROJETS GITHUB ===== */}
+      {/* ===== PROJETS CLIENTS / LIVRÉS ===== */}
       <div id="projets" className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
+        <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+          <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
+            <iconify-icon icon="solar:star-bold-duotone" class="text-yellow-400" style={{fontSize:'0.75rem'}}></iconify-icon>
+            <span>{lang === 'fr' ? 'Production' : 'Production'}</span>
+          </div>
+          <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
+            {lang === 'fr' ? 'Projets' : 'Delivered'} <span className="text-neutral-600">{lang === 'fr' ? 'Livrés' : 'Projects'}</span>
+          </h2>
+          <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
+            {lang === 'fr' ? 'Solutions concrètes développées pour des clients et actuellement en production.' : 'Real-world solutions developed for clients and currently in production.'}
+          </p>
+        </div>
+        <div className="w-full relative perspective-[2000px]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+            {CUSTOM_PROJECTS.map((repo, index) => renderRepoCard(repo, index))}
+          </div>
+        </div>
+      </div>
+
+      {/* ===== PROJETS GITHUB ===== */}
+      <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-16 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
         <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
           <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
             <iconify-icon icon="solar:code-bold-duotone" class="text-emerald-400" style={{fontSize:'0.75rem'}}></iconify-icon>
@@ -639,62 +759,7 @@ function App() {
             <div className="w-full relative perspective-[2000px]">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-emerald-900/10 blur-[120px] rounded-full pointer-events-none"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
-                {(showAllRepos ? repos : repos.slice(0, 4)).map((repo, index) => (
-                  <div
-                    key={repo.id}
-                    className={`animate-on-scroll group relative flex flex-col justify-between h-[420px] bg-neutral-950/40 backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-[2rem] p-8 transition-all duration-500 overflow-hidden ${index % 2 === 0 ? 'animate-levitate' : 'animate-levitate-delayed'} ${index % 2 === 1 ? 'lg:mt-12' : ''}`}
-                    data-animation="up"
-                    data-delay={String(200 + (index % 4) * 100)}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                    {/* Top row: language + stars */}
-                    <div className="flex justify-between items-start z-10 relative">
-                      <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500 border border-white/5 px-2 py-1 rounded-md bg-neutral-900/50">
-                        {repo.language || 'Code'}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <iconify-icon icon="solar:star-bold-duotone" class="text-yellow-400" style={{fontSize:'0.875rem'}}></iconify-icon>
-                        <span className="text-sm font-medium" style={{color: langColors[repo.language] || '#a3a3a3'}}>
-                          {repo.stargazers_count}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Center watermark: repo name */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden px-6">
-                      <span
-                        className="text-white font-bricolage font-bold text-center leading-none select-none transition-all duration-500 opacity-[0.06] group-hover:opacity-[0.14]"
-                        style={{fontSize:'clamp(1.5rem, 5vw, 3rem)', wordBreak:'break-word', textAlign:'center', textTransform:'uppercase', letterSpacing:'-0.04em'}}
-                      >{repo.name}</span>
-                    </div>
-                    {/* Bottom: commit count + description + actions */}
-                    <div className="z-10 relative flex flex-col gap-2 border-t border-white/5 pt-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-white font-bricolage group-hover:translate-x-1 transition-transform duration-300 leading-none">{commitCounts[repo.name] ?? '—'}</span>
-                        <span className="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500">commits</span>
-                      </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <a
-                          href={repo.html_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:text-white transition-colors"
-                          onClick={e => e.stopPropagation()}
-                        >
-                          <iconify-icon icon="simple-icons:github" style={{fontSize:'0.875rem'}}></iconify-icon>
-                          GitHub
-                          <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-neutral-600 group-hover:text-white transition-colors" style={{fontSize:'0.75rem'}}></iconify-icon>
-                        </a>
-                        <button
-                          onClick={() => setReadmeRepo(repo)}
-                          className="text-xs text-neutral-500 uppercase tracking-wider font-semibold flex items-center gap-1.5 hover:text-emerald-400 transition-colors"
-                        >
-                          <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'0.875rem'}}></iconify-icon>
-                          README
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {(showAllRepos ? repos : repos.slice(0, 4)).map((repo, index) => renderRepoCard(repo, index))}
               </div>
             </div>
             {repos.length > 4 && (
