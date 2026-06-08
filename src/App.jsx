@@ -176,7 +176,14 @@ const CUSTOM_PROJECTS = [
 function App() {
   const containerRef = useRef(null);
   const [lang, setLang] = useState('fr');
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) return savedTheme;
+      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    return 'dark';
+  });
   const t = translations[lang];
   const [repos, setRepos] = useState([]);
   const [reposLoading, setReposLoading] = useState(true);
@@ -257,6 +264,7 @@ function App() {
     } else {
       document.documentElement.classList.remove('light');
     }
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   useEffect(() => {
