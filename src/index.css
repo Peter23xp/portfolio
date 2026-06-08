@@ -19,6 +19,29 @@
   }
 }
 
+/* LIGHT MODE USING CSS INVERT */
+html.light {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: white; /* Ensure bg behaves well */
+}
+
+html.light body {
+  background-color: white; /* Ensure body matches */
+}
+
+/* Re-invert media so they look normal */
+html.light img,
+html.light video,
+html.light iframe,
+html.light .no-invert {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+html.light .border-gradient::before,
+html.light [style*="--border-gradient"]::before {
+  opacity: 0.5;
+}
+
 @layer utilities {
   .border-gradient {
     position: relative;

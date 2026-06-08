@@ -176,6 +176,7 @@ const CUSTOM_PROJECTS = [
 function App() {
   const containerRef = useRef(null);
   const [lang, setLang] = useState('fr');
+  const [theme, setTheme] = useState('dark');
   const t = translations[lang];
   const [repos, setRepos] = useState([]);
   const [reposLoading, setReposLoading] = useState(true);
@@ -249,6 +250,14 @@ function App() {
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  }, [theme]);
 
   useEffect(() => {
     ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
@@ -330,7 +339,7 @@ function App() {
       <img
         src="/peter.jpeg"
         alt="Peter Akilimali"
-        className="w-1/2 h-[960px] object-cover object-top rounded-[40px] absolute top-4 right-4 bottom-0 pointer-events-none opacity-40 md:opacity-100"
+        className="w-1/2 h-[960px] object-cover object-top rounded-[40px] absolute top-4 right-4 bottom-0 pointer-events-none opacity-40 md:opacity-100 no-invert"
       />
 
       {/* Background gradient */}
@@ -363,8 +372,17 @@ function App() {
           </div>
           <div className="flex items-center gap-4">
             <button
+              onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+              className="animate-on-scroll hidden md:flex items-center justify-center w-8 h-8 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all no-invert"
+              data-animation="right"
+              data-delay="25"
+              title={theme === 'dark' ? 'Mode Clair' : 'Mode Sombre'}
+            >
+              <iconify-icon icon={theme === 'dark' ? "solar:sun-bold-duotone" : "solar:moon-bold-duotone"} style={{fontSize:'1rem'}}></iconify-icon>
+            </button>
+            <button
               onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="animate-on-scroll hidden md:flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all"
+              className="animate-on-scroll hidden md:flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all no-invert"
               data-animation="right"
               data-delay="50"
             >
