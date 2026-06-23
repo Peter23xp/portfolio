@@ -62,28 +62,43 @@ function RepoModal({ repo, onClose, lang }) {
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center p-4"
-      style={{background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)'}}
+      style={{
+        position:'fixed', inset:0, zIndex:999,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        padding:'16px',
+        background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)',
+      }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative bg-neutral-950 border border-neutral-800 rounded-[2rem] w-full max-w-3xl h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div style={{
+        position:'relative',
+        backgroundColor:'#0a0a0a',
+        border:'1px solid #262626',
+        borderRadius:'2rem',
+        width:'100%',
+        maxWidth:'48rem',
+        height:'90vh',
+        display:'flex',
+        flexDirection:'column',
+        boxShadow:'0 25px 60px rgba(0,0,0,0.8)',
+      }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-800 flex-shrink-0">
-          <div className="flex items-center gap-3">
+        <div style={{flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 32px', borderBottom:'1px solid #262626'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
             <iconify-icon icon="solar:document-bold-duotone" class="text-emerald-400" style={{fontSize:'1.25rem'}}></iconify-icon>
-            <span className="text-white font-semibold text-sm uppercase tracking-widest font-bricolage">{repo.name}</span>
+            <span style={{color:'white', fontWeight:600, fontSize:'0.875rem', textTransform:'uppercase', letterSpacing:'0.1em'}}>{repo.name}</span>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
+            style={{width:'32px', height:'32px', borderRadius:'50%', background:'#171717', border:'1px solid #262626', display:'flex', alignItems:'center', justifyContent:'center', color:'#a3a3a3', cursor:'pointer'}}
           >
             <iconify-icon icon="solar:close-circle-bold-duotone" style={{fontSize:'1rem'}}></iconify-icon>
           </button>
         </div>
 
-        {/* Tabs — only shown when both exist */}
+        {/* Tabs */}
         {showTabs && (
-          <div className="flex gap-1 px-8 pt-4 flex-shrink-0">
+          <div style={{flexShrink:0, display:'flex', gap:'4px', padding:'16px 32px 0'}}>
             {[
               { key: 'readme', label: t.readme, icon: 'solar:document-bold-duotone' },
               { key: 'description', label: t.description, icon: 'solar:info-circle-bold-duotone' },
@@ -91,11 +106,15 @@ function RepoModal({ repo, onClose, lang }) {
               <button
                 key={key}
                 onClick={() => setTab(key)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[0.65rem] font-bold uppercase tracking-widest transition-all ${
-                  tab === key
-                    ? 'bg-neutral-800 text-white border border-neutral-700'
-                    : 'text-neutral-500 hover:text-neutral-300'
-                }`}
+                style={{
+                  display:'flex', alignItems:'center', gap:'6px',
+                  padding:'8px 16px', borderRadius:'9999px',
+                  fontSize:'0.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em',
+                  cursor:'pointer', transition:'all 0.15s',
+                  background: tab === key ? '#262626' : 'transparent',
+                  color: tab === key ? 'white' : '#737373',
+                  border: tab === key ? '1px solid #404040' : '1px solid transparent',
+                }}
               >
                 <iconify-icon icon={icon} style={{fontSize:'0.875rem'}}></iconify-icon>
                 {label}
@@ -104,37 +123,47 @@ function RepoModal({ repo, onClose, lang }) {
           </div>
         )}
 
-        {/* Body */}
-        <div className="overflow-y-auto px-8 py-6 flex-1 min-h-0">
+        {/* Body — scroll ici uniquement */}
+        <div style={{
+          flex:'1 1 0px',
+          minHeight:0,
+          overflowY:'auto',
+          overflowX:'hidden',
+          padding:'24px 32px',
+        }}>
           {readmeLoading ? (
-            <div className="flex items-center justify-center py-16">
+            <div style={{display:'flex', alignItems:'center', justifyContent:'center', padding:'64px 0'}}>
               <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : tab === 'readme' && hasReadme ? (
-            <pre className="text-neutral-300 text-xs leading-relaxed whitespace-pre-wrap font-mono break-words">{readme}</pre>
+            <pre style={{
+              color:'#d4d4d4',
+              fontSize:'0.75rem',
+              lineHeight:1.7,
+              whiteSpace:'pre-wrap',
+              wordBreak:'break-word',
+              fontFamily:'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              margin:0,
+            }}>{readme}</pre>
           ) : tab === 'description' && hasDesc ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <iconify-icon icon="solar:info-circle-bold-duotone" class="text-emerald-400" style={{fontSize:'1.25rem'}}></iconify-icon>
-                <span className="text-white font-semibold text-sm uppercase tracking-widest">{t.description}</span>
-              </div>
-              <p className="text-neutral-300 text-sm leading-relaxed">{repo.description}</p>
+            <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
+              <p style={{color:'#d4d4d4', fontSize:'0.875rem', lineHeight:1.7}}>{repo.description}</p>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 gap-3 text-neutral-500">
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'64px 0', gap:'12px', color:'#737373'}}>
               <iconify-icon icon="solar:document-bold-duotone" style={{fontSize:'2.5rem', opacity:0.3}}></iconify-icon>
-              <p className="text-xs uppercase tracking-widest">{t.noDoc}</p>
+              <p style={{fontSize:'0.75rem', textTransform:'uppercase', letterSpacing:'0.1em'}}>{t.noDoc}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-4 border-t border-neutral-800 flex-shrink-0 flex justify-end">
+        <div style={{flexShrink:0, padding:'16px 32px', borderTop:'1px solid #262626', display:'flex', justifyContent:'flex-end'}}>
           <a
             href={repo.html_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-[0.65rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 transition-all"
+            style={{display:'flex', alignItems:'center', gap:'8px', padding:'10px 20px', borderRadius:'9999px', border:'1px solid #404040', fontSize:'0.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', color:'#d4d4d4', textDecoration:'none'}}
           >
             <iconify-icon icon="simple-icons:github" style={{fontSize:'1rem'}}></iconify-icon>
             {t.openGithub}
