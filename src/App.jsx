@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { translations } from './i18n.js';
+import { fetchPublicProjects } from './lib/supabase.ts';
+import { fetchContributions, fetchRepoCommitCount } from './lib/github.ts';
 
 const GITHUB_USER = 'Peter23xp';
-const GH_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
-const ghFetch = (url) => fetch(url, GH_TOKEN ? { headers: { Authorization: `Bearer ${GH_TOKEN}` } } : {});
+// Les appels GitHub passent par /api/github (proxy serveur) — aucun token côté client.
+const ghFetch = (url) => fetch(`/api/github?path=${encodeURIComponent(new URL(url).pathname + new URL(url).search)}`);
 
 const langColors = {
   JavaScript: '#fbbf24',
@@ -192,6 +194,7 @@ function App() {
   const [commitCounts, setCommitCounts] = useState({});
   const [contributions, setContributions] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categorizedRepos, setCategorizedRepos] = useState({ livre: [], hackathon: [], personnel: [], contribution: [] });
 
   const renderRepoCard = (repo, index) => (
     <div
@@ -268,17 +271,60 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
-      .then(r => r.json())
+    const adaptRow = p => ({
+      id: p.github_id,
+      name: p.repo_name,
+      full_name: p.full_name,
+      description: p.description,
+      html_url: p.html_url,
+      homepage: p.homepage,
+      language: p.language,
+      stargazers_count: p.stars,
+      forks_count: p.forks,
+      topics: p.topics,
+      is_featured: p.is_featured,
+      category: p.category,
+      is_private: p.is_private,
+      updated_at: p.updated_at,
+    });
+
+    const fallbackToGitHub = () =>
+      ghFetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&direction=desc&per_page=100`)
+        .then(r => r.json())
+        .then(ghData => {
+          const rows = Array.isArray(ghData) ? ghData : (ghData?.data ?? []);
+          if (!Array.isArray(rows)) return;
+          setRepos(rows.filter(r => !r.fork && !r.archived && !r.private));
+        })
+        .catch(() => {})
+        .finally(() => setReposLoading(false));
+
+    fetchPublicProjects()
       .then(data => {
-        if (!Array.isArray(data)) return;
-        const filtered = data
-          .filter(r => !r.fork)
-          .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
-        setRepos(filtered);
+        if (data.length === 0) { fallbackToGitHub(); return; }
+
+        // non_classé public → section GitHub
+        const githubSection = data
+          .filter(p => p.category === 'non_classe' && !p.is_private)
+          .map(adaptRow);
+
+        // catégories classées
+        const bycat = { livre: [], hackathon: [], personnel: [], contribution: [] };
+        data.filter(p => p.category !== 'non_classe').forEach(p => {
+          if (bycat[p.category]) bycat[p.category].push(adaptRow(p));
+        });
+
+        // fallback GitHub pour la section repos si aucun non_classé public
+        if (githubSection.length > 0) {
+          setRepos(githubSection);
+          setReposLoading(false);
+        } else {
+          fallbackToGitHub();
+        }
+
+        setCategorizedRepos(bycat);
       })
-      .catch(() => {})
-      .finally(() => setReposLoading(false));
+      .catch(fallbackToGitHub);
   }, []);
 
   // fetch commit counts only for currently visible repos (saves API quota)
@@ -286,31 +332,16 @@ function App() {
     const visible = showAllRepos ? repos : repos.slice(0, 4);
     visible.forEach(repo => {
       if (repo.is_custom) return;
-      if (commitCounts[repo.name] !== undefined) return; // already fetched
-      ghFetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=1`)
-        .then(r => {
-          if (!r.ok) return;
-          const link = r.headers.get('Link') || '';
-          const match = link.match(/[?&]page=(\d+)>;\s*rel="last"/);
-          const count = match ? parseInt(match[1]) : 1;
-          setCommitCounts(prev => ({ ...prev, [repo.name]: count }));
-        })
+      if (commitCounts[repo.name] !== undefined) return;
+      fetchRepoCommitCount(GITHUB_USER, repo.name)
+        .then(count => setCommitCounts(prev => ({ ...prev, [repo.name]: count })))
         .catch(() => {});
     });
   }, [repos, showAllRepos]);
 
   useEffect(() => {
-    const query = `{ user(login: "${GITHUB_USER}") { contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } } } } }`;
-    fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query }),
-    })
-      .then(r => r.json())
-      .then(d => {
-        const cal = d?.data?.user?.contributionsCollection?.contributionCalendar;
-        if (cal) setContributions(cal);
-      })
+    fetchContributions(GITHUB_USER)
+      .then(cal => { if (cal) setContributions(cal); })
       .catch(() => {});
   }, []);
 
@@ -737,27 +768,104 @@ function App() {
         </div>
       </div>
 
-      {/* ===== PROJETS CLIENTS / LIVRÉS ===== */}
-      <div id="projets" className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
-        <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
-          <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
-            <iconify-icon icon="solar:star-bold-duotone" class="text-yellow-400" style={{fontSize:'0.75rem'}}></iconify-icon>
-            <span>{lang === 'fr' ? 'Production' : 'Production'}</span>
+      {/* ===== PROJETS LIVRÉS ===== */}
+      {(() => {
+        const livres = [...CUSTOM_PROJECTS, ...categorizedRepos.livre];
+        return (
+          <div id="projets" className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
+            <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+              <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
+                <iconify-icon icon="solar:star-bold-duotone" class="text-yellow-400" style={{fontSize:'0.75rem'}}></iconify-icon>
+                <span>{lang === 'fr' ? 'Production' : 'Production'}</span>
+              </div>
+              <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
+                {lang === 'fr' ? 'Projets' : 'Delivered'} <span className="text-neutral-600">{lang === 'fr' ? 'Livrés' : 'Projects'}</span>
+              </h2>
+              <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
+                {lang === 'fr' ? 'Solutions concrètes développées pour des clients et actuellement en production.' : 'Real-world solutions developed for clients and currently in production.'}
+              </p>
+            </div>
+            <div className="w-full relative perspective-[2000px]">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+                {livres.map((repo, index) => renderRepoCard(repo, index))}
+              </div>
+            </div>
           </div>
-          <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
-            {lang === 'fr' ? 'Projets' : 'Delivered'} <span className="text-neutral-600">{lang === 'fr' ? 'Livrés' : 'Projects'}</span>
-          </h2>
-          <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
-            {lang === 'fr' ? 'Solutions concrètes développées pour des clients et actuellement en production.' : 'Real-world solutions developed for clients and currently in production.'}
-          </p>
-        </div>
-        <div className="w-full relative perspective-[2000px]">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
-            {CUSTOM_PROJECTS.map((repo, index) => renderRepoCard(repo, index))}
+        );
+      })()}
+
+      {/* ===== HACKATHONS (affiché seulement si classés) ===== */}
+      {categorizedRepos.hackathon.length > 0 && (
+        <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-16 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
+          <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+            <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
+              <iconify-icon icon="solar:cup-star-bold-duotone" class="text-amber-400" style={{fontSize:'0.75rem'}}></iconify-icon>
+              <span>Hackathon</span>
+            </div>
+            <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
+              {lang === 'fr' ? 'Projets' : 'Projects'} <span className="text-neutral-600">Hackathon</span>
+            </h2>
+            <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
+              {lang === 'fr' ? 'Prototypes et solutions développés en compétition.' : 'Prototypes and solutions built in competition.'}
+            </p>
+          </div>
+          <div className="w-full relative perspective-[2000px]">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-amber-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+              {categorizedRepos.hackathon.map((repo, index) => renderRepoCard(repo, index))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* ===== PROJETS PERSONNELS (affiché seulement si classés) ===== */}
+      {categorizedRepos.personnel.length > 0 && (
+        <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-16 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
+          <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+            <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
+              <iconify-icon icon="solar:user-bold-duotone" class="text-blue-400" style={{fontSize:'0.75rem'}}></iconify-icon>
+              <span>{lang === 'fr' ? 'Personnel' : 'Personal'}</span>
+            </div>
+            <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
+              {lang === 'fr' ? 'Projets' : 'Personal'} <span className="text-neutral-600">{lang === 'fr' ? 'Personnels' : 'Projects'}</span>
+            </h2>
+            <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
+              {lang === 'fr' ? 'Expérimentations et apprentissages personnels.' : 'Personal experiments and learning projects.'}
+            </p>
+          </div>
+          <div className="w-full relative perspective-[2000px]">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+              {categorizedRepos.personnel.map((repo, index) => renderRepoCard(repo, index))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== CONTRIBUTIONS OPEN SOURCE (affiché seulement si classés) ===== */}
+      {categorizedRepos.contribution.length > 0 && (
+        <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-16 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
+          <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+            <div className="animate-on-scroll flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/50 text-[0.65rem] uppercase tracking-widest text-neutral-400 font-semibold" data-animation="up" data-delay="0">
+              <iconify-icon icon="solar:users-group-rounded-bold-duotone" class="text-teal-400" style={{fontSize:'0.75rem'}}></iconify-icon>
+              <span>{lang === 'fr' ? 'Open Source' : 'Open Source'}</span>
+            </div>
+            <h2 className="animate-on-scroll md:text-5xl lg:text-6xl uppercase leading-[0.9] text-3xl font-medium text-white tracking-tight font-bricolage" data-animation="up" data-delay="100">
+              {lang === 'fr' ? 'Contributions' : 'Open Source'} <span className="text-neutral-600">{lang === 'fr' ? 'Open Source' : 'Contributions'}</span>
+            </h2>
+            <p className="animate-on-scroll text-sm md:text-base text-neutral-400 font-normal uppercase tracking-wide max-w-xl" data-animation="up" data-delay="150">
+              {lang === 'fr' ? 'Participations à des projets communautaires et open source.' : 'Contributions to community and open source projects.'}
+            </p>
+          </div>
+          <div className="w-full relative perspective-[2000px]">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-teal-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+              {categorizedRepos.contribution.map((repo, index) => renderRepoCard(repo, index))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ===== PROJETS GITHUB ===== */}
       <div className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-16 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">

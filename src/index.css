@@ -19,6 +19,48 @@
   }
 }
 
+/* ── Admin panel reset ──────────────────────────────────────────────────────
+   Annule les styles du portfolio public (centrage XL, padding)
+   sur les pages /admin et /login.                                          */
+.admin-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  @apply bg-adm-bg text-adm-ink font-space;
+}
+
+/* Scrollbar fin et discret dans les colonnes admin */
+.adm-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 3px;
+}
+.adm-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.adm-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(0.30 0.008 275);
+  border-radius: 9999px;
+}
+.adm-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.40 0.010 275);
+}
+.adm-scrollbar { scrollbar-width: thin; scrollbar-color: oklch(0.30 0.008 275) transparent; }
+
+/* Focus ring unifié pour l'admin */
+.adm-focus:focus-visible {
+  outline: 2px solid oklch(0.63 0.22 277 / 0.70);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-root *,
+  .admin-root *::before,
+  .admin-root *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* LIGHT MODE USING CSS INVERT */
 html.light {
   filter: invert(1) hue-rotate(180deg);

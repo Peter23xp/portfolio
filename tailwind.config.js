@@ -13,6 +13,39 @@ export default {
         oswald: ['"Clash Display"', 'sans-serif'],
         bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
       },
+      // Palette admin — dark violet-tinted, Linear-inspired.
+      // Utiliser avec le préfixe `adm-` : bg-adm-bg, text-adm-ink-2, etc.
+      colors: {
+        adm: {
+          bg:             'oklch(0.09 0.008 275)',
+          surface:        'oklch(0.125 0.009 275)',
+          card:           'oklch(0.155 0.010 275)',
+          'card-hover':   'oklch(0.185 0.011 275)',
+          border:         'oklch(0.225 0.009 275)',
+          'border-strong':'oklch(0.320 0.011 275)',
+          ink:            'oklch(0.96 0.004 275)',
+          'ink-2':        'oklch(0.76 0.007 275)',
+          'ink-3':        'oklch(0.56 0.007 275)',
+          accent:         'oklch(0.62 0.22 277)',
+          'accent-bright':'oklch(0.75 0.18 277)',
+          'accent-dim':   'oklch(0.62 0.22 277 / 0.12)',
+          'accent-border':'oklch(0.62 0.22 277 / 0.40)',
+        },
+      },
+      keyframes: {
+        'spin-once': {
+          '0%':   { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        'card-in': {
+          '0%':   { opacity: '0', transform: 'translateY(6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'spin-once': 'spin-once 0.6s ease-out',
+        'card-in':   'card-in 0.15s ease-out',
+      },
     },
   },
   plugins: [

@@ -1,2 +1,8 @@
 allowBuilds:
   esbuild: set this to true or false
+# esbuild (dépendance de Vite) fournit un binaire pré-compilé : on autorise son
+# script de build et on évite que pnpm fasse échouer `build`/`dev` sur la
+# vérification d'install (pnpm 11 lit ces réglages ici, pas dans .npmrc).
+onlyBuiltDependencies:
+  - esbuild
+verifyDepsBeforeRun: false
