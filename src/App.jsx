@@ -66,7 +66,7 @@ function RepoModal({ repo, onClose, lang }) {
       style={{background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)'}}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative bg-neutral-950 border border-neutral-800 rounded-[2rem] w-full max-w-3xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+      <div className="relative bg-neutral-950 border border-neutral-800 rounded-[2rem] w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-800 flex-shrink-0">
           <div className="flex items-center gap-3">
@@ -105,13 +105,13 @@ function RepoModal({ repo, onClose, lang }) {
         )}
 
         {/* Body */}
-        <div className="overflow-y-auto px-8 py-6 flex-1">
+        <div className="overflow-y-auto px-8 py-6 flex-1 min-h-0">
           {readmeLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : tab === 'readme' && hasReadme ? (
-            <pre className="text-neutral-300 text-xs leading-relaxed whitespace-pre-wrap font-mono">{readme}</pre>
+            <pre className="text-neutral-300 text-xs leading-relaxed whitespace-pre-wrap font-mono break-words">{readme}</pre>
           ) : tab === 'description' && hasDesc ? (
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
