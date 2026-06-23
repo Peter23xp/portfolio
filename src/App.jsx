@@ -227,6 +227,10 @@ function App() {
   const [contributions, setContributions] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categorizedRepos, setCategorizedRepos] = useState({ livre: [], hackathon: [], personnel: [], contribution: [] });
+  const [showAllLivre, setShowAllLivre] = useState(false);
+  const [showAllHackathon, setShowAllHackathon] = useState(false);
+  const [showAllPersonnel, setShowAllPersonnel] = useState(false);
+  const [showAllContribution, setShowAllContribution] = useState(false);
 
   const renderRepoCard = (repo, index) => (
     <div
@@ -810,6 +814,7 @@ function App() {
       {/* ===== PROJETS LIVRÉS ===== */}
       {(() => {
         const livres = [...CUSTOM_PROJECTS, ...categorizedRepos.livre];
+        const visibleLivre = showAllLivre ? livres : livres.slice(0, 3);
         return (
           <div id="projets" className="flex flex-col md:px-0 z-20 w-full max-w-[90rem] border-white/5 border-t mt-32 mr-auto ml-auto pt-12 pr-4 pb-12 pl-4 relative gap-y-16">
             <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
@@ -827,9 +832,18 @@ function App() {
             <div className="w-full relative perspective-[2000px]">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
-                {livres.map((repo, index) => renderRepoCard(repo, index))}
+                {visibleLivre.map((repo, index) => renderRepoCard(repo, index))}
               </div>
             </div>
+            {livres.length > 3 && (
+              <div className="flex justify-center mt-8">
+                <button onClick={() => setShowAllLivre(v => !v)} className="group flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 hover:border-neutral-600 transition-all duration-300">
+                  <iconify-icon icon="solar:star-bold-duotone" class="text-yellow-400" style={{fontSize:'1rem'}}></iconify-icon>
+                  {showAllLivre ? (lang === 'fr' ? 'Voir moins' : 'Show less') : (lang === 'fr' ? `Voir les ${livres.length - 3} autres` : `View ${livres.length - 3} more`)}
+                  <iconify-icon icon="solar:alt-arrow-down-bold-duotone" class="text-neutral-500 group-hover:text-white transition-all duration-300" style={{fontSize:'1rem', transform: showAllLivre ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.3s'}}></iconify-icon>
+                </button>
+              </div>
+            )}
           </div>
         );
       })()}
@@ -852,9 +866,18 @@ function App() {
           <div className="w-full relative perspective-[2000px]">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-amber-900/10 blur-[120px] rounded-full pointer-events-none"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
-              {categorizedRepos.hackathon.map((repo, index) => renderRepoCard(repo, index))}
+              {(showAllHackathon ? categorizedRepos.hackathon : categorizedRepos.hackathon.slice(0, 3)).map((repo, index) => renderRepoCard(repo, index))}
             </div>
           </div>
+          {categorizedRepos.hackathon.length > 3 && (
+            <div className="flex justify-center mt-8">
+              <button onClick={() => setShowAllHackathon(v => !v)} className="group flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 hover:border-neutral-600 transition-all duration-300">
+                <iconify-icon icon="solar:cup-star-bold-duotone" class="text-amber-400" style={{fontSize:'1rem'}}></iconify-icon>
+                {showAllHackathon ? (lang === 'fr' ? 'Voir moins' : 'Show less') : (lang === 'fr' ? `Voir les ${categorizedRepos.hackathon.length - 3} autres` : `View ${categorizedRepos.hackathon.length - 3} more`)}
+                <iconify-icon icon="solar:alt-arrow-down-bold-duotone" class="text-neutral-500 group-hover:text-white transition-all duration-300" style={{fontSize:'1rem', transform: showAllHackathon ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.3s'}}></iconify-icon>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -876,9 +899,18 @@ function App() {
           <div className="w-full relative perspective-[2000px]">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
-              {categorizedRepos.personnel.map((repo, index) => renderRepoCard(repo, index))}
+              {(showAllPersonnel ? categorizedRepos.personnel : categorizedRepos.personnel.slice(0, 3)).map((repo, index) => renderRepoCard(repo, index))}
             </div>
           </div>
+          {categorizedRepos.personnel.length > 3 && (
+            <div className="flex justify-center mt-8">
+              <button onClick={() => setShowAllPersonnel(v => !v)} className="group flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 hover:border-neutral-600 transition-all duration-300">
+                <iconify-icon icon="solar:user-bold-duotone" class="text-blue-400" style={{fontSize:'1rem'}}></iconify-icon>
+                {showAllPersonnel ? (lang === 'fr' ? 'Voir moins' : 'Show less') : (lang === 'fr' ? `Voir les ${categorizedRepos.personnel.length - 3} autres` : `View ${categorizedRepos.personnel.length - 3} more`)}
+                <iconify-icon icon="solar:alt-arrow-down-bold-duotone" class="text-neutral-500 group-hover:text-white transition-all duration-300" style={{fontSize:'1rem', transform: showAllPersonnel ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.3s'}}></iconify-icon>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -900,9 +932,18 @@ function App() {
           <div className="w-full relative perspective-[2000px]">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[40%] bg-teal-900/10 blur-[120px] rounded-full pointer-events-none"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
-              {categorizedRepos.contribution.map((repo, index) => renderRepoCard(repo, index))}
+              {(showAllContribution ? categorizedRepos.contribution : categorizedRepos.contribution.slice(0, 3)).map((repo, index) => renderRepoCard(repo, index))}
             </div>
           </div>
+          {categorizedRepos.contribution.length > 3 && (
+            <div className="flex justify-center mt-8">
+              <button onClick={() => setShowAllContribution(v => !v)} className="group flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 text-[0.7rem] font-bold uppercase tracking-widest text-neutral-300 hover:bg-neutral-800 hover:border-neutral-600 transition-all duration-300">
+                <iconify-icon icon="solar:users-group-rounded-bold-duotone" class="text-teal-400" style={{fontSize:'1rem'}}></iconify-icon>
+                {showAllContribution ? (lang === 'fr' ? 'Voir moins' : 'Show less') : (lang === 'fr' ? `Voir les ${categorizedRepos.contribution.length - 3} autres` : `View ${categorizedRepos.contribution.length - 3} more`)}
+                <iconify-icon icon="solar:alt-arrow-down-bold-duotone" class="text-neutral-500 group-hover:text-white transition-all duration-300" style={{fontSize:'1rem', transform: showAllContribution ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.3s'}}></iconify-icon>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
