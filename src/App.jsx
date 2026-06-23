@@ -359,17 +359,24 @@ function App() {
       .catch(fallbackToGitHub);
   }, []);
 
-  // fetch commit counts only for currently visible repos (saves API quota)
+  // fetch commit counts for all visible repos (GitHub section + categorized)
   useEffect(() => {
-    const visible = showAllRepos ? repos : repos.slice(0, 4);
-    visible.forEach(repo => {
+    const githubVisible = showAllRepos ? repos : repos.slice(0, 4);
+    const allCategorized = [
+      ...categorizedRepos.livre,
+      ...categorizedRepos.hackathon,
+      ...categorizedRepos.personnel,
+      ...categorizedRepos.contribution,
+    ];
+    const allVisible = [...githubVisible, ...allCategorized];
+    allVisible.forEach(repo => {
       if (repo.is_custom) return;
       if (commitCounts[repo.name] !== undefined) return;
       fetchRepoCommitCount(GITHUB_USER, repo.name)
         .then(count => setCommitCounts(prev => ({ ...prev, [repo.name]: count })))
         .catch(() => {});
     });
-  }, [repos, showAllRepos]);
+  }, [repos, showAllRepos, categorizedRepos]);
 
   useEffect(() => {
     fetchContributions(GITHUB_USER)
