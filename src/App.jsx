@@ -29,15 +29,18 @@ function RepoModal({ repo, onClose, lang }) {
   const [tab, setTab] = useState('readme');
 
   useEffect(() => {
-    fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo.name}/readme`, {
-      headers: { Accept: 'application/vnd.github.raw', ...(GH_TOKEN ? { Authorization: `Bearer ${GH_TOKEN}` } : {}) }
+    fetch(`/api/github?path=${encodeURIComponent(`/repos/${GITHUB_USER}/${repo.name}/readme`)}`, {
+      headers: { Accept: 'application/vnd.github.raw' }
     })
-      .then(r => r.ok ? r.text() : Promise.reject())
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(json => {
+        const encoded = json?.data?.content ?? '';
+        if (!encoded) throw new Error('no content');
+        return decodeURIComponent(escape(atob(encoded.replace(/\n/g, ''))));
+      })
       .then(text => setReadme(text))
       .catch(() => setReadme(null))
-      .finally(() => {
-        setReadmeLoading(false);
-      });
+      .finally(() => setReadmeLoading(false));
   }, [repo.name]);
 
   // once loading done, default to whichever tab has content
