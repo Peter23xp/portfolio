@@ -66,7 +66,7 @@ function RepoModal({ repo, onClose, lang }) {
       style={{background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)'}}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative bg-neutral-950 border border-neutral-800 rounded-[2rem] w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+      <div className="relative bg-neutral-950 border border-neutral-800 rounded-[2rem] w-full max-w-3xl h-[90vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-800 flex-shrink-0">
           <div className="flex items-center gap-3">
