@@ -1,49 +1,44 @@
 // api/github.js — Vercel Serverless Function
-// Proxy sécurisé pour l'API GitHub. Le token reste côté serveur,
-// jamais exposé dans le bundle client.
+// Proxy sécurisé pour l'API GitHub. Le token reste côté serveur.
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
-const ALLOWED_PATHS = new Set([
-  '/user/repos',
-  '/users/Peter23xp/repos',
-  '/graphql',
-]);
 
-function isAllowedEndpoint(path) {
-  // Accepte les chemins exacts ou les sous-chemins de repos connus
-  if (ALLOWED_PATHS.has(path)) return true;
-  if (/^\/repos\/Peter23xp\/[^/]+\/commits$/.test(path)) return true;
-  if (/^\/repos\/Peter23xp\/[^/]+\/readme$/.test(path)) return true;
+function isAllowedEndpoint(pathname) {
+  if (pathname === '/user/repos') return true;
+  if (pathname === '/users/Peter23xp/repos') return true;
+  if (pathname === '/graphql') return true;
+  if (/^\/repos\/Peter23xp\/[^/]+\/commits$/.test(pathname)) return true;
+  if (/^\/repos\/Peter23xp\/[^/]+\/readme$/.test(pathname)) return true;
   return false;
 }
 
 export default async function handler(req, res) {
-  // CORS — uniquement le domaine du portfolio
   const origin = req.headers.origin ?? '';
-  const allowed = ['https://peterakilimali.site', 'http://localhost:5173'];
+  const allowed = ['https://peterakilimali.site', 'http://localhost:5173', 'http://localhost:5174'];
   if (allowed.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    res.status(204).end();
-    return;
-  }
+  if (req.method === 'OPTIONS') { res.status(204).end(); return; }
 
-  // Lire le chemin et la méthode cibles depuis la requête
-  const { path, method = 'GET', body } = req.method === 'POST'
-    ? req.body ?? {}
-    : { path: req.query.path, method: 'GET', body: null };
+  let path, method, body;
+  if (req.method === 'POST') {
+    const b = req.body ?? {};
+    path = b.path; method = b.method || 'POST'; body = b.body;
+  } else {
+    path = req.query?.path; method = 'GET'; body = null;
+  }
 
   if (!path || typeof path !== 'string') {
     res.status(400).json({ error: 'Missing path parameter' });
     return;
   }
 
-  // Whitelist stricte — aucun path arbitraire n'est proxifié
-  if (!isAllowedEndpoint(path)) {
+  // Séparer pathname et query string pour la validation
+  const [pathname, queryString] = path.split('?');
+  if (!isAllowedEndpoint(pathname)) {
     res.status(403).json({ error: 'Endpoint not allowed' });
     return;
   }
