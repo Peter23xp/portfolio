@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import Icon from './Icon.jsx';
+import Device from './Device.jsx';
+import { projectColor, washClick, washOut } from './wash.js';
+import { useTilt } from './tilt.js';
 import { PigmentGlyph } from './Pigment.jsx';
 import { DEFAULT_CONTENT, fetchContent, pick } from '../lib/content.js';
 import { translations } from '../i18n.js';
@@ -39,27 +42,51 @@ function ScreensRail({ shots, name, lang, t }) {
     return () => mq.removeEventListener('change', update);
   }, [shots.length]);
 
+  // Défilement + ruban courbe (inspiration : posts.design, « Curved Ribbon
+  // Gallery » de Shiv) : chaque écran pivote en 3D et recule selon sa distance
+  // au centre de l'écran. Épinglé (desktop) : le scroll vertical fait avancer le
+  // ruban. Libre (mobile) : le glissement horizontal fait la même courbe.
   useEffect(() => {
-    if (!pinned) return undefined;
-    const section = sectionRef.current, track = trackRef.current;
-    let raf = 0;
+    const section = sectionRef.current, track = trackRef.current, viewport = track.parentElement;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let raf = 0, tx = 0;
+    const curve = () => {
+      const half = window.innerWidth / 2;
+      const base = viewport.getBoundingClientRect().left - viewport.scrollLeft + tx;
+      for (const li of track.children) {
+        const center = base + li.offsetLeft + li.offsetWidth / 2;
+        const off = Math.max(-1.6, Math.min(1.6, (center - half) / half));
+        const angle = Math.max(-42, Math.min(42, -off * 30));
+        li.style.transform = `perspective(1400px) rotateY(${angle.toFixed(2)}deg) translateZ(${(-Math.abs(off) * 150).toFixed(1)}px)`;
+        li.style.opacity = String(1 - Math.min(0.4, Math.abs(off) * 0.28));
+      }
+    };
     const apply = () => {
       raf = 0;
-      const rect = section.getBoundingClientRect();
-      const travel = section.offsetHeight - window.innerHeight;
-      const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, travel)));
-      const max = track.scrollWidth - track.parentElement.clientWidth;
-      track.style.transform = `translate3d(${-progress * max}px, 0, 0)`;
+      if (pinned) {
+        const rect = section.getBoundingClientRect();
+        const travel = section.offsetHeight - window.innerHeight;
+        const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, travel)));
+        const max = track.scrollWidth - viewport.clientWidth;
+        tx = -progress * max;
+        track.style.transform = `translate3d(${tx}px, 0, 0)`;
+      } else {
+        tx = 0;
+      }
+      if (!reduce) curve();
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
     apply();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+    viewport.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      viewport.removeEventListener('scroll', onScroll);
       if (raf) cancelAnimationFrame(raf);
       track.style.transform = '';
+      for (const li of track.children) { li.style.transform = ''; li.style.opacity = ''; }
     };
   }, [pinned]);
 
@@ -79,7 +106,7 @@ function ScreensRail({ shots, name, lang, t }) {
           <ol className="rail__track" ref={trackRef}>
             {shots.map((s, i) => (
               <li key={s.url} className="rail__item">
-                <img src={s.url} alt={pick(s, 'alt', lang) || `${name} — ${i + 1}`} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
+                <Device className="rail__device" src={s.url} alt={pick(s, 'alt', lang) || `${name} — ${i + 1}`} eager={i < 3} />
                 <span className="rail__index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               </li>
             ))}
@@ -92,6 +119,11 @@ function ScreensRail({ shots, name, lang, t }) {
 
 export default function CaseStudy() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const [nextColor, setNextColor] = useState(null);
+  const heroRef = useRef(null);
+  const deviceRef = useRef(null);
+  useTilt(heroRef, deviceRef);
   const [lang, setLang] = useLang();
   const t = translations[lang];
   const [content, setContent] = useState(DEFAULT_CONTENT);
@@ -114,7 +146,14 @@ export default function CaseStudy() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    // la page est prête : le lavis de pigment se retire
+    const id = requestAnimationFrame(() => washOut());
+    return () => cancelAnimationFrame(id);
   }, [slug]);
+  useEffect(() => {
+    const src = next?.screenshots?.[0]?.url || next?.icon_url;
+    projectColor(src).then(setNextColor);
+  }, [next]);
   useEffect(() => {
     if (project) document.title = `${project.name} — Peter Akilimali`;
   }, [project]);
@@ -126,6 +165,8 @@ export default function CaseStudy() {
       ))}
     </div>
   );
+
+  const shots = project?.screenshots || [];
 
   if (!project) {
     return (
@@ -143,19 +184,19 @@ export default function CaseStudy() {
     );
   }
 
-  const shots = project.screenshots || [];
   const body = pick(project, 'body', lang);
   const role = pick(project, 'role', lang);
 
   return (
     <div className="site case">
       <a className="skip" href="#case-main">{t.nav.skip}</a>
-      <header className="case__hero">
+      <header className="case__hero" ref={heroRef}>
         <nav className="case__bar wrap" aria-label="Navigation">
           <Link className="case__back" to="/"><Icon name="ph:arrow-left-bold" /> {t.case.back}</Link>
           <LangSwitch />
         </nav>
-        <div className="wrap case__heroin">
+        <div className={`wrap case__heroin ${shots.length ? 'case__heroin--device' : ''}`}>
+          <div className="case__copy">
           <div className="case__id">
             {project.icon_url
               ? <img className="case__icon" src={project.icon_url} width="72" height="72" alt="" />
@@ -173,6 +214,12 @@ export default function CaseStudy() {
             {project.site_url && <a className="pill" href={project.site_url} target="_blank" rel="noopener noreferrer">{t.case.site} <Icon name="ph:arrow-up-right-bold" /></a>}
             {project.github_url && <a className="pill" href={project.github_url} target="_blank" rel="noopener noreferrer"><Icon name="simple-icons:github" /> {t.case.github}</a>}
           </div>
+          </div>
+          {shots.length > 0 && (
+            <div className="case__device" ref={deviceRef}>
+              <Device className="case__lead" src={shots[0].url} alt={pick(shots[0], 'alt', lang) || `${project.name} — 1`} eager />
+            </div>
+          )}
         </div>
       </header>
 
@@ -199,7 +246,7 @@ export default function CaseStudy() {
         )}
 
         {next && (
-          <Link className="case__next" to={`/projets/${next.slug}`}>
+          <Link className="case__next" to={`/projets/${next.slug}`} onClick={washClick(navigate, `/projets/${next.slug}`, nextColor)}>
             <span className="wrap case__nextin">
               <span className="case__nextlabel">{t.case.next}</span>
               <span className="case__nextname">{next.name}</span>

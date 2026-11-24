@@ -9,7 +9,8 @@ import './portfolio/portfolio.css';
 import Icon from './portfolio/Icon.jsx';
 import Featured from './portfolio/Featured.jsx';
 import { DEFAULT_CONTENT, fetchContent, pick } from './lib/content.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { washClick } from './portfolio/wash.js';
 
 const GITHUB_USER = 'Peter23xp';
 const SECTION_ORDER = {
@@ -114,6 +115,7 @@ function RepoDialog({ repo, onClose, t }) {
 
 /* ── Ligne de projet ────────────────────────────────────────────────────── */
 function ProjectRow({ repo, t, commits, onReadme }) {
+  const navigate = useNavigate();
   const kindLabel = repo.web3 ? t.work.kinds.web3 : t.work.kinds[repo.kind];
   const stars = typeof repo.stargazers_count === 'number' ? repo.stargazers_count : 0;
   const site = repo.homepage && /^https?:/.test(repo.homepage) ? repo.homepage : null;
@@ -139,7 +141,7 @@ function ProjectRow({ repo, t, commits, onReadme }) {
           </a>
         )}
         {repo.slug && (
-          <Link className="link-action" to={`/projets/${repo.slug}`}>
+          <Link className="link-action" to={`/projets/${repo.slug}`} onClick={washClick(navigate, `/projets/${repo.slug}`)}>
             {t.work.caseStudy}<span className="sr-only"> — {repo.name}</span>
           </Link>
         )}

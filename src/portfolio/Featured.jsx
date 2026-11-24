@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Icon from './Icon.jsx';
+import Device from './Device.jsx';
 import { PigmentGlyph } from './Pigment.jsx';
 import { pick } from '../lib/content.js';
+import { projectColor, washClick } from './wash.js';
+import { useTilt } from './tilt.js';
 
 // Bloc « projets phares » : un ou plusieurs projets vitrine (choisis dans
 // l'admin), présentés un à la fois. Le changement de projet passe par une
@@ -17,7 +20,19 @@ const swap = (fn) => {
 
 export default function Featured({ projects, lang, t }) {
   const [idx, setIdx] = useState(0);
+  const [colors, setColors] = useState({});
+  const navigate = useNavigate();
+  const zoneRef = useRef(null);
+  const stageRef = useRef(null);
+  useTilt(zoneRef, stageRef, 6);
   const count = projects.length;
+  // couleur de chaque projet, prise sur sa première capture (ou son icône)
+  useEffect(() => {
+    projects.forEach((proj) => {
+      const src = proj.screenshots?.[0]?.url || proj.icon_url;
+      projectColor(src).then((c) => c && setColors((prev) => (prev[proj.slug] ? prev : { ...prev, [proj.slug]: c })));
+    });
+  }, [projects]);
   useEffect(() => { if (idx >= count) setIdx(0); }, [count, idx]);
   if (!count) return null;
   const p = projects[Math.min(idx, count - 1)];
@@ -25,7 +40,7 @@ export default function Featured({ projects, lang, t }) {
   const shots = (p.screenshots || []).slice(0, 3);
 
   return (
-    <div className="featured">
+    <div className="featured" ref={zoneRef}>
       {count > 1 && (
         <div className="featured__nav">
           <div className="featured__tabs" role="tablist" aria-label={t.work.featuredLabel}>
@@ -80,7 +95,7 @@ export default function Featured({ projects, lang, t }) {
             {p.ios_url && <a className="pill" href={p.ios_url} target="_blank" rel="noopener noreferrer"><Icon name="simple-icons:apple" /> App Store</a>}
             {p.android_url && <a className="pill" href={p.android_url} target="_blank" rel="noopener noreferrer"><Icon name="simple-icons:googleplay" /> Google Play</a>}
             {p.site_url && <a className="pill" href={p.site_url} target="_blank" rel="noopener noreferrer">{t.work.site} <Icon name="ph:arrow-up-right-bold" /></a>}
-            <Link className="link-action" to={`/projets/${p.slug}`}>
+            <Link className="link-action" to={`/projets/${p.slug}`} onClick={washClick(navigate, `/projets/${p.slug}`, colors[p.slug])}>
               {t.work.caseStudy}<span className="sr-only"> — {p.name}</span> <Icon name="ph:arrow-right-bold" />
             </Link>
           </div>
@@ -88,13 +103,14 @@ export default function Featured({ projects, lang, t }) {
 
         <figure className="feature__shots">
           {shots.length > 0 ? (
-            <div className={`shots shots--${shots.length}`}>
-              {shots.map((s, i) => (
-                <img key={s.url} className={`shot shot--${i + 1}`} src={s.url} width="480" height="1040" loading="lazy" decoding="async" alt={pick(s, 'alt', lang) || `${p.name} — ${i + 1}`} />
+            <div className="stage" ref={stageRef}>
+              {shots.slice(1).map((s, i) => (
+                <Device key={s.url} className={`stage__back stage__back--${i + 1}`} src={s.url} alt={pick(s, 'alt', lang) || `${p.name} — ${i + 2}`} />
               ))}
+              <Device className="stage__lead" src={shots[0].url} alt={pick(shots[0], 'alt', lang) || `${p.name} — 1`} />
             </div>
           ) : (
-            <div className="shots shots--empty" aria-hidden="true">
+            <div className="stage stage--empty" aria-hidden="true">
               <PigmentGlyph kind="livre" seed={p.slug + '-big'} />
             </div>
           )}
