@@ -3,7 +3,8 @@ import { flushSync } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Icon from './Icon.jsx';
-import Device from './Device.jsx';
+import { useShotKinds } from './Device.jsx';
+import ShotStage from './ShotStage.jsx';
 import { PigmentGlyph } from './Pigment.jsx';
 import { pick } from '../lib/content.js';
 import { projectColor, washClick } from './wash.js';
@@ -23,9 +24,11 @@ export default function Featured({ projects, lang, t }) {
   const [colors, setColors] = useState({});
   const navigate = useNavigate();
   const zoneRef = useRef(null);
-  const stageRef = useRef(null);
-  useTilt(zoneRef, stageRef, 6);
+  // l'inclinaison s'applique au bloc : la scène (recréée à chaque projet) en hérite
+  useTilt(zoneRef, zoneRef, 6);
   const count = projects.length;
+  const current = projects[Math.min(idx, Math.max(0, count - 1))];
+  const kindOf = useShotKinds(current?.screenshots);
   // couleur de chaque projet, prise sur sa première capture (ou son icône)
   useEffect(() => {
     projects.forEach((proj) => {
@@ -37,7 +40,7 @@ export default function Featured({ projects, lang, t }) {
   if (!count) return null;
   const p = projects[Math.min(idx, count - 1)];
   const go = (n) => swap(() => setIdx((n + count) % count));
-  const shots = (p.screenshots || []).slice(0, 3);
+  const shots = p.screenshots || [];
 
   return (
     <div className="featured" ref={zoneRef}>
@@ -103,12 +106,7 @@ export default function Featured({ projects, lang, t }) {
 
         <figure className="feature__shots">
           {shots.length > 0 ? (
-            <div className="stage" ref={stageRef}>
-              {shots.slice(1).map((s, i) => (
-                <Device key={s.url} className={`stage__back stage__back--${i + 1}`} src={s.url} alt={pick(s, 'alt', lang) || `${p.name} — ${i + 2}`} />
-              ))}
-              <Device className="stage__lead" src={shots[0].url} alt={pick(shots[0], 'alt', lang) || `${p.name} — 1`} />
-            </div>
+            <ShotStage shots={shots} kindOf={kindOf} name={p.name} lang={lang} siteUrl={p.site_url} />
           ) : (
             <div className="stage stage--empty" aria-hidden="true">
               <PigmentGlyph kind="livre" seed={p.slug + '-big'} />

@@ -8,6 +8,20 @@ export interface Screenshot {
   url: string
   alt_fr?: string
   alt_en?: string
+  /** cadre d'affichage : téléphone ou fenêtre de navigateur (absent = déduit des proportions) */
+  kind?: 'mobile' | 'desktop'
+}
+
+/** Type d'une capture d'après ses proportions : plus large que haute = ordinateur. */
+export async function detectShotKind(file: File): Promise<'mobile' | 'desktop'> {
+  try {
+    const bmp = await createImageBitmap(file)
+    const kind = bmp.width > bmp.height * 1.05 ? 'desktop' : 'mobile'
+    bmp.close()
+    return kind
+  } catch {
+    return 'mobile'
+  }
 }
 
 export interface ShowcaseProject {
@@ -143,7 +157,7 @@ export async function saveSetting(key: string, value: unknown): Promise<void> {
 const BUCKET = 'portfolio-media'
 
 // Réduit et convertit une image en WebP avant envoi : les captures restent légères.
-export async function compressImage(file: File, maxSide = 1400, quality = 0.82): Promise<Blob> {
+export async function compressImage(file: File, maxSide = 1600, quality = 0.82): Promise<Blob> {
   if (!file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.type === 'image/gif') return file
   const bitmap = await createImageBitmap(file)
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))

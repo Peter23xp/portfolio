@@ -602,10 +602,7 @@ body.portfolio ::-webkit-scrollbar-thumb { background: var(--ink); border-radius
   -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent);
           mask-image: radial-gradient(closest-side, #000 30%, transparent);
 }
-.case__lead {
-  --w: clamp(230px, 21vw, 300px); z-index: 1;
-  margin-bottom: calc(-1 * clamp(5rem, 12vw, 9rem)); /* déborde sur la galerie */
-}
+.case__lead { position: relative; z-index: 1; margin-bottom: calc(-1 * clamp(5rem, 12vw, 9rem)); /* déborde sur la galerie */ }
 @media (prefers-reduced-motion: no-preference) {
   .case__lead { animation: device-rise 1.1s var(--ease) 0.15s both; }
 }
@@ -647,3 +644,57 @@ body.portfolio ::-webkit-scrollbar-thumb { background: var(--ink); border-radius
   border-radius: 6px; box-shadow: 0 6px 18px oklch(0.2 0.05 35 / 0.16);
 }
 .cv__status { text-align: center; margin-bottom: 1.5rem; }
+
+/* ── Cadre navigateur (captures d'ordinateur) ───────────────────────────── */
+.browser {
+  position: relative; display: block; flex: none;
+  padding: 0 6px 6px; border-radius: 12px;
+  background: oklch(0.2 0.02 40);
+  box-shadow: 0 14px 30px oklch(0.18 0.05 35 / 0.34), inset 0 0 0 1px oklch(0.38 0.03 40);
+}
+.browser__bar { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 6px; }
+.browser__dots { display: inline-flex; gap: 5px; flex: none; }
+.browser__dots i { display: block; width: 8px; height: 8px; border-radius: 50%; background: oklch(0.42 0.03 40); }
+.browser__url {
+  flex: 1; max-width: 58%; margin-inline: auto; transform: translateX(-20px);
+  height: 18px; border-radius: 999px; background: oklch(0.28 0.02 40);
+  color: oklch(0.82 0.02 35); font-size: 11px; line-height: 18px; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-inline: 10px;
+}
+.browser__screen { display: block; overflow: hidden; border-radius: 6px; background: #fff; }
+.browser__screen img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+
+/* ── Duo : fenêtre en grand + téléphone devant ──────────────────────────── */
+.stage--duo { min-height: 0; padding: 4% 0 10%; }
+.stage__browser { width: min(100%, 560px); z-index: 1; }
+.stage__phone {
+  --w: clamp(104px, 10.5vw, 150px);
+  position: absolute; right: 0; bottom: 0; z-index: 3;
+  transform: translateZ(60px);
+}
+@media (max-width: 767px) {
+  .stage__browser { width: 92%; }
+  .stage__phone { --w: 27vw; right: 2%; }
+}
+
+/* en-tête d'étude de cas avec capture d'ordinateur : colonne visuelle plus large */
+.case__heroin--desk { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); }
+.case__lead.stage--duo { width: 100%; padding: 0 0 8%; margin-bottom: calc(-1 * clamp(4rem, 10vw, 8rem)); }
+.case__lead.stage--duo .stage__browser { width: 100%; }
+.case__lead.stage--duo .stage__phone { --w: clamp(110px, 10vw, 160px); right: -3%; }
+.case__lead.stage--hero:not(.stage--duo) { min-height: 0; display: block; }
+.case__lead.stage--hero:not(.stage--duo) .stage__lead { --w: clamp(230px, 21vw, 300px); transform: none; }
+.case__lead::before { display: none; }
+
+/* galerie : fenêtres plus larges que les téléphones */
+.rail__browser { width: clamp(440px, 46vw, 760px); }
+@media (max-width: 899px) { .rail__browser { width: 84vw; } }
+
+/* titre de l'étude de cas : jamais coupé au milieu d'un mot ; plus petit quand la colonne visuelle est large */
+.case__name { overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.case__heroin--desk .case__name { font-size: clamp(2.6rem, 5.4vw, 4.6rem); max-width: none; }
+@media (max-width: 899px) {
+  .case__heroin--desk { grid-template-columns: 1fr; }
+  .case__lead.stage--duo { width: 100%; max-width: 560px; }
+  .case__lead.stage--duo .stage__phone { --w: 27vw; right: 0; }
+}

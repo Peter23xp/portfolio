@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import Icon from './Icon.jsx';
-import Device from './Device.jsx';
+import { Screen, hostOf, useShotKinds } from './Device.jsx';
+import ShotStage from './ShotStage.jsx';
 import { projectColor, washClick, washOut } from './wash.js';
 import { useTilt } from './tilt.js';
 import { track } from '../lib/analytics.js';
@@ -30,7 +31,7 @@ function useLang() {
 }
 
 // Galerie épinglée : progression du défilement vertical → translation horizontale.
-function ScreensRail({ shots, name, lang, t }) {
+function ScreensRail({ shots, name, lang, t, kindOf, host }) {
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const [pinned, setPinned] = useState(false);
@@ -107,7 +108,7 @@ function ScreensRail({ shots, name, lang, t }) {
           <ol className="rail__track" ref={trackRef}>
             {shots.map((s, i) => (
               <li key={s.url} className="rail__item">
-                <Device className="rail__device" src={s.url} alt={pick(s, 'alt', lang) || `${name} — ${i + 1}`} eager={i < 3} />
+                <Screen shot={s} className={kindOf(s) === 'desktop' ? 'rail__browser' : 'rail__device'} host={host} alt={pick(s, 'alt', lang) || `${name} — ${i + 1}`} eager={i < 3} />
                 <span className="rail__index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               </li>
             ))}
@@ -169,6 +170,8 @@ export default function CaseStudy() {
   );
 
   const shots = project?.screenshots || [];
+  const kindOf = useShotKinds(project?.screenshots);
+  const hasDesk = shots.some((sh) => kindOf(sh) === 'desktop');
 
   if (!project) {
     return (
@@ -197,7 +200,7 @@ export default function CaseStudy() {
           <Link className="case__back" to="/"><Icon name="ph:arrow-left-bold" /> {t.case.back}</Link>
           <LangSwitch />
         </nav>
-        <div className={`wrap case__heroin ${shots.length ? 'case__heroin--device' : ''}`}>
+        <div className={`wrap case__heroin ${shots.length ? 'case__heroin--device' : ''} ${hasDesk ? 'case__heroin--desk' : ''}`}>
           <div className="case__copy">
           <div className="case__id">
             {project.icon_url
@@ -219,14 +222,14 @@ export default function CaseStudy() {
           </div>
           {shots.length > 0 && (
             <div className="case__device" ref={deviceRef}>
-              <Device className="case__lead" src={shots[0].url} alt={pick(shots[0], 'alt', lang) || `${project.name} — 1`} eager />
+              <ShotStage shots={shots} kindOf={kindOf} name={project.name} lang={lang} siteUrl={project.site_url} variant="hero" className="case__lead" />
             </div>
           )}
         </div>
       </header>
 
       <main id="case-main" tabIndex={-1}>
-        {shots.length > 0 && <ScreensRail shots={shots} name={project.name} lang={lang} t={t} />}
+        {shots.length > 0 && <ScreensRail shots={shots} name={project.name} lang={lang} t={t} kindOf={kindOf} host={hostOf(project.site_url)} />}
 
         {(body || role) && (
           <section className="section case__story" aria-label={t.case.project}>

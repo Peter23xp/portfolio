@@ -19,6 +19,7 @@ import {
   saveShowcase,
   slugify,
   uploadMedia,
+  detectShotKind,
   type ShowcaseProject,
 } from '../../lib/admin-content'
 import { cn } from '../../lib/utils'
@@ -197,7 +198,8 @@ export default function ShowcasePage() {
     const added: ShowcaseProject['screenshots'] = []
     for (const f of files) {
       try {
-        added.push({ url: await uploadMedia(f, folder), alt_fr: '', alt_en: '' })
+        const kind = await detectShotKind(f)
+        added.push({ url: await uploadMedia(f, folder), alt_fr: '', alt_en: '', kind })
       } catch (e) {
         toast.error(`Échec de l'envoi : ${f.name}`, { description: (e as Error).message })
       }
@@ -380,6 +382,19 @@ export default function ShowcasePage() {
                         </div>
                         <input aria-label={`Description FR de la capture ${i + 1}`} placeholder="Description (FR)" value={s.alt_fr ?? ''} onChange={(e) => setShots(shots.map((x, k) => (k === i ? { ...x, alt_fr: e.target.value } : x)))} className={cn(inputClass, 'h-9 text-[13px]')} />
                         <input aria-label={`Description EN de la capture ${i + 1}`} placeholder="Description (EN)" value={s.alt_en ?? ''} onChange={(e) => setShots(shots.map((x, k) => (k === i ? { ...x, alt_en: e.target.value } : x)))} className={cn(inputClass, 'h-9 text-[13px]')} />
+                        <label className="flex items-center justify-between gap-2 text-[13px] font-medium text-adm-ink-2">
+                          Cadre
+                          <select
+                            aria-label={`Cadre de la capture ${i + 1}`}
+                            value={s.kind ?? ''}
+                            onChange={(e) => setShots(shots.map((x, k) => (k === i ? { ...x, kind: (e.target.value || undefined) as 'mobile' | 'desktop' | undefined } : x)))}
+                            className={cn(inputClass, 'h-9 w-auto text-[13px]')}
+                          >
+                            <option value="">Auto (selon l'image)</option>
+                            <option value="mobile">Mobile (téléphone)</option>
+                            <option value="desktop">Ordinateur (navigateur)</option>
+                          </select>
+                        </label>
                         <div className="flex items-center justify-between">
                           <div className="flex">
                             <IconButton label="Déplacer avant" disabled={i === 0} onClick={() => moveShot(i, -1)}>{Icons.left}</IconButton>
