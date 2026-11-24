@@ -13,8 +13,14 @@ import React, { useEffect, useRef } from 'react';
 // Le <img> placé dessous reste le contenu de repli (sans JS, avant le premier
 // dessin) ; le canvas est décoratif (aria-hidden).
 
-const PHOTO = '/peter-cutout.webp'; // portrait détouré (alpha), dérivé de peter.jpeg
-const PHOTO_RATIO = 756 / 1198;
+// Portrait détouré (alpha), dérivé de peter.jpeg. Deux cadrages : en pied
+// (desktop) et buste seul (mobile, la bande n'en montre que le haut). AVIF en
+// priorité, WebP en repli.
+const PHOTO_SRC = {
+  full: { avif: '/portrait/peter-full.avif', webp: '/portrait/peter-full.webp', frac: 1 },
+  bust: { avif: '/portrait/peter-bust.avif', webp: '/portrait/peter-bust.webp', frac: 0.62 },
+};
+const PHOTO_RATIO = 756 / 1198; // proportions du portrait entier
 const HEX = Math.sqrt(3) / 2;
 
 // Encres du monde (sRGB, dérivées des tokens OKLCH de portfolio.css)
@@ -69,6 +75,11 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
       navigator.connection?.saveData;
 
     let img = null;
+    let imgKind = null;   // 'full' | 'bust'
+    let imgFrac = 1;      // part de la hauteur du portrait couverte par l'image chargée
+    // écran tactile : pas de curseur pour révéler la photo → la trame se
+    // « développe » en photo nette au chargement (les chromatophores se rétractent)
+    const touch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     let W = 0, H = 0, dpr = 1, desktop = true;
     // champ
     let cell = 10, fcols = 0, frows = 0, fieldPts = null; // [x, y, tailleJitter] par cellule
@@ -141,7 +152,7 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
       off.width = pcols;
       off.height = prows;
       const octx = off.getContext('2d', { willReadFrequently: true });
-      octx.drawImage(img, 0, 0, pcols, prows);
+      octx.drawImage(img, 0, 0, pcols, Math.round(prows * imgFrac));
       const data = octx.getImageData(0, 0, pcols, prows).data;
       const raw = new Uint8Array(n);
       for (let j = 0; j < prows; j++)
@@ -254,7 +265,7 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
       const cc = cutoutLayer.getContext('2d');
       cc.setTransform(dpr, 0, 0, dpr, 0, 0);
       cc.imageSmoothingQuality = 'high';
-      cc.drawImage(img, photo.x, photo.y, photo.w, photo.h);
+      cc.drawImage(img, photo.x, photo.y, photo.w, photo.h * imgFrac);
       if (!desktop) {
         const g = cc.createLinearGradient(0, H * 0.62, 0, H * 0.98);
         g.addColorStop(0, 'rgba(0,0,0,1)');
@@ -345,7 +356,26 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
       ctx.fillStyle = FIELD_LIGHT;
       ctx.fill(light);
 
-      if (photoLayer) {
+      if (photoLayer && touch && cutoutLayer) {
+        // tactile : la trame se dissout en photo nette (~1,3 s), puis reste nette
+        const develop = still ? 1 : smooth(0, 1, (now - introStart - 350) / 1300);
+        if (develop > 0) {
+          ctx.globalAlpha = develop;
+          ctx.drawImage(cutoutLayer, 0, 0, W, H);
+          ctx.globalAlpha = 1;
+        }
+        if (develop < 1) {
+          ctx.save();
+          ctx.globalAlpha = 1 - develop;
+          if (intro < 1) {
+            ctx.beginPath();
+            ctx.arc(photo.fx, photo.fy, intro * Math.hypot(photo.w, photo.h), 0, Math.PI * 2);
+            ctx.clip();
+          }
+          ctx.drawImage(photoLayer, 0, 0, W, H);
+          ctx.restore();
+        }
+      } else if (photoLayer) {
         const lensR = pointer ? (desktop ? 120 : 84) * Math.min(1, pointer.strength) : 0;
         const lensOn = lensR > 6 && !!cutoutLayer;
 
@@ -405,27 +435,29 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
           ctx.drawImage(photoLayer, 0, 0, W, H);
         }
         if (intro < 1) ctx.restore();
+      }
 
-        // ondes (changement de contexte, toucher) : le pigment se dilate au passage
-        if (s.ripples.length) {
-          for (let idx = 0; idx < figure.length; idx++) {
-            if (!figure[idx]) continue;
-            const x = pts[idx * 2], y = pts[idx * 2 + 1];
-            let expand = 0;
-            for (const r of s.ripples) {
-              const age = now - r.t0;
-              const d = Math.hypot(x - r.x, y - r.y) - age * 0.85;
-              expand += Math.exp(-(d * d) / 1800) * (1 - age / 2200) * 0.9;
-            }
-            if (expand < 0.05) continue;
-            const e = Math.min(1, expand);
-            const rad = restR[idx] * (1 - e) + pcell * 0.72 * e * fade[idx];
-            if (rad < 0.3) continue;
-            ctx.fillStyle = TONES[tone[idx]];
-            ctx.beginPath();
-            ctx.arc(x, y, rad, 0, Math.PI * 2);
-            ctx.fill();
+      // ondes (changement de contexte, toucher) : le pigment se dilate au
+      // passage. Sur la photo nette (tactile), les points n'existent que dans l'onde.
+      if (photoLayer && s.ripples.length) {
+        const overClear = touch && !!cutoutLayer;
+        for (let idx = 0; idx < figure.length; idx++) {
+          if (!figure[idx]) continue;
+          const x = pts[idx * 2], y = pts[idx * 2 + 1];
+          let expand = 0;
+          for (const r of s.ripples) {
+            const age = now - r.t0;
+            const d = Math.hypot(x - r.x, y - r.y) - age * 0.85;
+            expand += Math.exp(-(d * d) / 1800) * (1 - age / 2200) * 0.9;
           }
+          if (expand < 0.05) continue;
+          const e = Math.min(1, expand);
+          const rad = (overClear ? 0 : restR[idx] * (1 - e)) + pcell * 0.72 * e * fade[idx];
+          if (rad < 0.3) continue;
+          ctx.fillStyle = TONES[tone[idx]];
+          ctx.beginPath();
+          ctx.arc(x, y, rad, 0, Math.PI * 2);
+          ctx.fill();
         }
       }
 
@@ -437,7 +469,7 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
         pointer.strength *= 0.9;
         if (pointer.strength < 0.02) pointer = null;
       }
-      return settling || s.ripples.length > 0 || !!pointer || now - introStart < 1600;
+      return settling || s.ripples.length > 0 || !!pointer || now - introStart < (touch ? 2100 : 1600);
     };
 
     const loop = (now) => {
@@ -485,7 +517,7 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
       host.addEventListener('pointerdown', onDown);
     }
 
-    const ro = new ResizeObserver(() => { layout(); if (reduceMotion.matches) draw(performance.now()); else s.wake(); });
+    const ro = new ResizeObserver(() => { layout(); loadPhoto(); if (reduceMotion.matches) draw(performance.now()); else s.wake(); });
     ro.observe(canvas);
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -495,18 +527,31 @@ export default function SkinCanvas({ mode, pulse, onReady }) {
     const onVis = () => (document.hidden ? stop() : start());
     document.addEventListener('visibilitychange', onVis);
 
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = PHOTO;
-    image.onload = () => {
-      if (disposed) return;
-      img = image;
-      layout();
-      introStart = performance.now();
-      if (reduceMotion.matches) draw(introStart);
-      else { idleUntil = introStart + 1600; start(); }
+    // charge le cadrage adapté (buste < 768 px, en pied au-delà), AVIF puis WebP
+    const loadPhoto = () => {
+      const kind = canvas.getBoundingClientRect().width >= 768 ? 'full' : 'bust';
+      if (kind === imgKind) return;
+      imgKind = kind;
+      const src = PHOTO_SRC[kind];
+      const tryLoad = (url, fallback) => {
+        const im = new Image();
+        im.decoding = 'async';
+        im.onload = () => {
+          if (disposed || imgKind !== kind) return;
+          img = im;
+          imgFrac = src.frac;
+          layout();
+          introStart = performance.now();
+          if (reduceMotion.matches) draw(introStart);
+          else { idleUntil = introStart + (touch ? 2100 : 1600); start(); }
+        };
+        im.onerror = () => { if (fallback && !disposed) tryLoad(fallback, null); };
+        im.src = url;
+      };
+      tryLoad(src.avif, src.webp);
     };
     layout();
+    loadPhoto();
 
     return () => {
       disposed = true;

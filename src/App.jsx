@@ -1,41 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { translations } from './i18n.js';
-import { fetchPublicProjects } from './lib/supabase.ts';
+import { fetchPublicProjects } from './lib/publicProjects.js';
 import { fetchContributions, fetchRepoCommitCount } from './lib/github.ts';
 import SkinCanvas from './portfolio/SkinCanvas.jsx';
 import { PigmentGlyph, PigmentSwatch } from './portfolio/Pigment.jsx';
 import './portfolio/portfolio.css';
-import { addCollection } from 'iconify-icon';
-import { phIcons, simpleIcons } from './portfolio/icons.js';
-
-addCollection(phIcons);
-addCollection(simpleIcons);
+import Icon from './portfolio/Icon.jsx';
+import Featured from './portfolio/Featured.jsx';
+import { DEFAULT_CONTENT, fetchContent, pick } from './lib/content.js';
+import { Link } from 'react-router-dom';
 
 const GITHUB_USER = 'Peter23xp';
-const LINKS = {
-  email: 'mailto:peter23xp@gmail.com',
-  emailLabel: 'peter23xp@gmail.com',
-  whatsapp: 'https://wa.me/243902238740',
-  whatsappLabel: '+243 902 238 740',
-  linkedin: 'https://www.linkedin.com/in/peter-akilimali-1a7016282/',
-  github: 'https://github.com/Peter23xp',
-  cv: '/peterCv.pdf',
-};
-const CHADITO = {
-  site: 'https://chadito.net',
-  ios: 'https://apps.apple.com/rw/app/chadito/id6757854742',
-  android: 'https://play.google.com/store/apps/details?id=com.chadito.app',
-};
-
-// Les autres produits livrés hors GitHub.
-const SHIPPED = [
-  { id: 'custom-progress-business', name: 'Progress Business', language: 'React', html_url: 'https://progress-business.vercel.app/', homepage: 'https://progress-business.vercel.app/', is_custom: true, kind: 'livre',
-    description: { fr: 'Application de gestion d’entreprise : ERP et CRM.', en: 'Business management application: ERP and CRM.' } },
-  { id: 'custom-forever-united', name: 'Forever United', language: 'Web', html_url: 'https://forever-united.vercel.app/', homepage: 'https://forever-united.vercel.app/', is_custom: true, kind: 'livre',
-    description: { fr: 'Plateforme web pour le bénévolat et les œuvres caritatives.', en: 'Web platform for volunteering and charity work.' } },
-];
-
 const SECTION_ORDER = {
   neutral: ['work', 'expertise', 'journey', 'activity'],
   recruit: ['expertise', 'journey', 'work', 'activity'],
@@ -53,10 +29,6 @@ const withTransition = (fn) => {
   if (!document.startViewTransition || prefersReducedMotion()) { fn(); return; }
   document.startViewTransition(() => flushSync(fn));
 };
-
-const Icon = ({ name, label }) => (
-  <iconify-icon icon={name} noobserver="" aria-hidden={label ? undefined : 'true'} aria-label={label} class="icon"></iconify-icon>
-);
 
 /* ── README ─────────────────────────────────────────────────────────────── */
 function RepoDialog({ repo, onClose, t }) {
@@ -166,6 +138,11 @@ function ProjectRow({ repo, t, commits, onReadme }) {
             {t.work.site}<span className="sr-only"> — {repo.name}</span> <Icon name="ph:arrow-up-right-bold" />
           </a>
         )}
+        {repo.slug && (
+          <Link className="link-action" to={`/projets/${repo.slug}`}>
+            {t.work.caseStudy}<span className="sr-only"> — {repo.name}</span>
+          </Link>
+        )}
         {!repo.is_custom && (
           <>
             <a className="link-action" href={repo.html_url} target="_blank" rel="noopener noreferrer">
@@ -201,11 +178,42 @@ export default function App() {
   const [commitCounts, setCommitCounts] = useState({});
   const [contributions, setContributions] = useState(null);
   const [readmeRepo, setReadmeRepo] = useState(null);
+  const [content, setContent] = useState(DEFAULT_CONTENT);
+
+  // contenu éditable (admin) : défauts immédiats, puis version Supabase
+  useEffect(() => {
+    let alive = true;
+    fetchContent().then((c) => alive && setContent(c)).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
+  const { settings } = content;
+  const LINKS = useMemo(() => ({
+    email: `mailto:${settings.contact.email}`,
+    emailLabel: settings.contact.email,
+    whatsapp: settings.contact.whatsapp,
+    whatsappLabel: settings.contact.whatsapp_label,
+    linkedin: settings.contact.linkedin,
+    github: settings.contact.github,
+    cv: settings.contact.cv_url,
+  }), [settings]);
+  const featuredProjects = useMemo(() => {
+    const f = content.showcase.filter((p) => p.is_featured);
+    return f.length ? f : content.showcase.slice(0, 1);
+  }, [content]);
+  const available = settings.profile.available !== false;
 
   // classe de page : les styles du portfolio ne fuient pas vers /admin
   useEffect(() => {
     document.body.classList.add('portfolio');
     return () => document.body.classList.remove('portfolio');
+  }, []);
+
+  // retour d'une étude de cas vers une ancre (#contact, #work…)
+  useEffect(() => {
+    if (!window.location.hash) return undefined;
+    const id = setTimeout(() => document.querySelector(window.location.hash)?.scrollIntoView(), 250);
+    return () => clearTimeout(id);
   }, []);
 
   // langue : persistée, appliquée au document
@@ -253,7 +261,7 @@ export default function App() {
 
   // liste unifiée
   const projects = useMemo(() => {
-    const seen = new Set(['chadito']);
+    const seen = new Set(featuredProjects.map((p) => p.name.toLowerCase()));
     const out = [];
     const push = (repo, kind) => {
       const key = repo.name.toLowerCase();
@@ -264,10 +272,17 @@ export default function App() {
       const descriptionText = raw ? raw.replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '') : raw;
       out.push({ ...repo, kind, descriptionText, web3: kind !== 'livre' && isWeb3(repo) });
     };
-    SHIPPED.forEach((p) => push(p, 'livre'));
+    content.showcase
+      .filter((p) => !featuredProjects.includes(p))
+      .forEach((p) => push({
+        id: `sc-${p.slug}`, slug: p.slug, name: p.name, is_custom: true,
+        language: p.stack?.[0] || p.platforms || '',
+        html_url: p.site_url || p.github_url, homepage: p.site_url,
+        description: { fr: p.tagline_fr, en: p.tagline_en },
+      }, p.category || 'livre'));
     ['livre', 'hackathon', 'personnel', 'contribution', 'github'].forEach((k) => categorized[k].forEach((r) => push(r, k)));
     return out;
-  }, [categorized, lang]);
+  }, [categorized, lang, content, featuredProjects]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return projects;
@@ -340,33 +355,7 @@ export default function App() {
         <div className="wrap">
           <h2 id="work-title" className="h2">{t.work.title[context]}</h2>
 
-          <article className="feature" aria-labelledby="chadito-title">
-            <div className="feature__text">
-              <div className="feature__id">
-                <img src="/chadito/chadito-icon.webp" width="56" height="56" alt="" className="feature__icon" />
-                <h3 id="chadito-title" className="feature__name">Chadito</h3>
-              </div>
-              <p className="feature__tagline">{t.work.chadito.tagline}</p>
-              <p className="feature__body">{t.work.chadito.body}</p>
-              <dl className="facts">
-                <div><dt>{t.work.chadito.platformsLabel}</dt><dd>{t.work.chadito.platforms}</dd></div>
-                <div><dt>Stack</dt><dd>{t.work.chadito.stack}</dd></div>
-              </dl>
-              <div className="feature__links">
-                <a className="pill" href={CHADITO.ios} target="_blank" rel="noopener noreferrer"><Icon name="simple-icons:apple" /> {t.work.chadito.appStore}</a>
-                <a className="pill" href={CHADITO.android} target="_blank" rel="noopener noreferrer"><Icon name="simple-icons:googleplay" /> {t.work.chadito.playStore}</a>
-                <a className="link-action" href={CHADITO.site} target="_blank" rel="noopener noreferrer">{t.work.chadito.site} <Icon name="ph:arrow-up-right-bold" /></a>
-              </div>
-            </div>
-            <figure className="feature__shots">
-              <div className="shots">
-                {[1, 2, 3].map((n, i) => (
-                  <img key={n} className={`shot shot--${n}`} src={`/chadito/chadito-${n}.webp`} width="480" height="1040" loading="lazy" decoding="async" alt={t.work.chadito.shotAlts[i]} />
-                ))}
-              </div>
-              <figcaption className="caption">{t.work.chadito.caption}</figcaption>
-            </figure>
-          </article>
+          <Featured projects={featuredProjects} lang={lang} t={t} />
 
           <div className="filters" role="radiogroup" aria-label={t.work.filters.label}>
             {FILTERS.filter((f) => reposState !== 'ready' || f === 'all' || counts[f] > 0).map((f) => (
@@ -384,7 +373,7 @@ export default function App() {
             ))}
           </div>
 
-          {reposState === 'error' && projects.length <= SHIPPED.length && (
+          {reposState === 'error' && projects.length <= content.showcase.length && (
             <p className="notice" role="status">
               {t.work.error}{' '}
               <a href={LINKS.github} target="_blank" rel="noopener noreferrer">{t.work.errorAction}</a>
@@ -421,18 +410,18 @@ export default function App() {
             <p className="lede">{t.expertise.intro}</p>
           </div>
           <ul className="domains">
-            {t.expertise.domains.map((d) => (
-              <li key={d.key} className="domain">
-                <PigmentSwatch name={d.key} />
-                <h3 className="domain__title">{d.title}</h3>
-                <p className="domain__body">{d.body}</p>
-                <p className="tags">{d.tags.map((tag) => <span key={tag}>{tag}</span>)}</p>
+            {settings.expertise.domains.map((d, i) => (
+              <li key={d.key || i} className="domain">
+                <PigmentSwatch name={['apps', 'web3', 'erp', 'strategy'][i % 4]} />
+                <h3 className="domain__title">{pick(d, 'title', lang)}</h3>
+                <p className="domain__body">{pick(d, 'body', lang)}</p>
+                <p className="tags">{(d.tags || []).map((tag) => <span key={tag}>{tag}</span>)}</p>
               </li>
             ))}
           </ul>
           <p className="stack">
             <span className="stack__label">{t.expertise.stackLabel}</span>
-            React / Next.js · React Native · Node.js · PostgreSQL / MySQL · Solidity
+            {settings.expertise.stack.join(' · ')}
           </p>
         </div>
       </section>
@@ -454,11 +443,11 @@ export default function App() {
                 return <circle key={i} cx={x} cy={y.toFixed(1)} r={rad.toFixed(2)} />;
               })}
             </svg>
-            {t.journey.steps.map((s, i) => (
-              <li key={s.period} className={`step ${i === t.journey.steps.length - 1 ? 'step--now' : ''}`}>
-                <span className="step__period">{s.period}</span>
-                <h3 className="step__title">{s.title}</h3>
-                <p className="step__detail">{s.detail}</p>
+            {content.timeline.map((s, i) => (
+              <li key={s.id || i} className={`step ${i === content.timeline.length - 1 ? 'step--now' : ''}`}>
+                <span className="step__period">{pick(s, 'period', lang)}</span>
+                <h3 className="step__title">{pick(s, 'title', lang)}</h3>
+                {pick(s, 'detail', lang) && <p className="step__detail">{pick(s, 'detail', lang)}</p>}
               </li>
             ))}
           </ol>
@@ -484,7 +473,12 @@ export default function App() {
       <a className="skip" href="#main">{t.nav.skip}</a>
 
       <header className={`hero ${skinReady ? 'is-skin' : ''}`} id="top" aria-labelledby="hero-name">
-        <img className="hero__portrait" src="/peter-cutout.webp" width="756" height="1198" alt={t.hero.portraitAlt} fetchpriority="high" />
+        <picture>
+          <source media="(min-width: 768px)" type="image/avif" srcSet="/portrait/peter-full.avif" />
+          <source media="(min-width: 768px)" type="image/webp" srcSet="/portrait/peter-full.webp" />
+          <source type="image/avif" srcSet="/portrait/peter-bust.avif" />
+          <img className="hero__portrait" src="/portrait/peter-bust.webp" width="756" height="743" alt={t.hero.portraitAlt} fetchpriority="high" decoding="async" />
+        </picture>
         <SkinCanvas mode={context} pulse={pulse} onReady={onSkinReady} />
 
         <nav className="nav" aria-label="Navigation">
@@ -516,7 +510,7 @@ export default function App() {
           <h1 id="hero-name" className={`hero__name ${pulse ? 'is-pulse' : ''}`} key={pulse?.id ?? 'init'}>
             <span>Peter</span> <span>Akilimali</span>
           </h1>
-          <p className="hero__role">{t.hero.role}</p>
+          <p className="hero__role">{pick(settings.profile, 'role', lang) || t.hero.role}</p>
 
           <div className="switch" role="group" aria-labelledby="switch-label">
             <span id="switch-label" className="switch__label">{t.hero.switchLabel}</span>
@@ -530,7 +524,7 @@ export default function App() {
             </div>
           </div>
 
-          <p className="hero__lede" aria-live="polite">{t.hero.lede[context]}</p>
+          <p className="hero__lede" aria-live="polite">{settings.hero[`lede_${lang}`]?.[context] || t.hero.lede[context]}</p>
 
           <div className="hero__actions">
             <a
@@ -546,8 +540,8 @@ export default function App() {
         </div>
 
         <p className="hero__status">
-          <span className="signal" aria-hidden="true" /> <strong>{t.hero.available}</strong>
-          <span className="hero__loc">{t.hero.location}</span>
+          {available && <><span className="signal" aria-hidden="true" /> <strong>{t.hero.available}</strong></>}
+          <span className="hero__loc">{pick(settings.profile, 'location', lang) || t.hero.location}</span>
         </p>
       </header>
 
@@ -570,13 +564,13 @@ export default function App() {
               <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer"><span className="channel__k">{t.contact.linkedin}</span><span className="channel__v">Peter Akilimali</span><Icon name="ph:arrow-up-right-bold" /></a>
             </li>
             <li>
-              <a href={LINKS.github} target="_blank" rel="noopener noreferrer"><span className="channel__k">{t.contact.github}</span><span className="channel__v">Peter23xp</span><Icon name="ph:arrow-up-right-bold" /></a>
+              <a href={LINKS.github} target="_blank" rel="noopener noreferrer"><span className="channel__k">{t.contact.github}</span><span className="channel__v">{LINKS.github.split('/').filter(Boolean).pop()}</span><Icon name="ph:arrow-up-right-bold" /></a>
             </li>
             <li>
-              <a href={LINKS.cv} download><span className="channel__k">{t.contact.cv}</span><span className="channel__v">peterCv.pdf</span><Icon name="ph:file-arrow-down-bold" /></a>
+              <a href={LINKS.cv} download><span className="channel__k">{t.contact.cv}</span><span className="channel__v">{LINKS.cv.split('/').pop()}</span><Icon name="ph:file-arrow-down-bold" /></a>
             </li>
           </ul>
-          <p className="close__status"><span className="signal" aria-hidden="true" /> {t.contact.available}</p>
+          {available && <p className="close__status"><span className="signal" aria-hidden="true" /> {t.contact.available}</p>}
           <div className="close__foot">
             <span>{t.footer.line}</span>
             <a href="#top">{t.footer.top}</a>

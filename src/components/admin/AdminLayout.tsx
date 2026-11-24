@@ -1,21 +1,33 @@
 // src/components/admin/AdminLayout.tsx
-// Coque de l'admin : barre à l'encre (comme le héro du site), zone de travail
-// en manteau pigmenté. L'action principale (Sync) est la seule en iridophore.
+// Coque de l'admin : barre à l'encre (comme le héro du site) avec les onglets,
+// zone de travail en manteau pigmenté. L'action principale de chaque page est
+// la seule en iridophore.
 
 import type { ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, NavLink } from 'react-router-dom'
 import { Toaster } from 'sonner'
 
 import { GitHubSyncButton } from './GitHubSyncButton'
 import { Button } from '../ui/button'
 import { signOut, useSession } from '../../lib/auth-client'
+import { cn } from '../../lib/utils'
 
 interface AdminLayoutProps {
   children: ReactNode
-  isSyncing: boolean
-  onSync: () => void
-  repoCount: number
+  /** Page des dépôts : bouton de synchronisation GitHub */
+  isSyncing?: boolean
+  onSync?: () => void
+  repoCount?: number
+  /** Action principale d'une autre page (ex. « Nouveau projet ») */
+  actions?: ReactNode
 }
+
+const TABS = [
+  { to: '/admin', label: 'Dépôts GitHub', end: true },
+  { to: '/admin/vitrine', label: 'Projets vitrine', end: false },
+  { to: '/admin/parcours', label: 'Parcours', end: false },
+  { to: '/admin/contenu', label: 'Contenu', end: false },
+]
 
 // même marque que la navigation du site : un amas de chromatophores
 export function PigmentMark({ className = '' }: { className?: string }) {
@@ -40,7 +52,7 @@ function LoadingShell() {
   )
 }
 
-export function AdminLayout({ children, isSyncing, onSync, repoCount }: AdminLayoutProps) {
+export function AdminLayout({ children, isSyncing = false, onSync, repoCount, actions }: AdminLayoutProps) {
   const { data: session, isPending } = useSession()
 
   if (isPending) return <LoadingShell />
@@ -60,39 +72,53 @@ export function AdminLayout({ children, isSyncing, onSync, repoCount }: AdminLay
         position="bottom-right"
       />
 
-      <header className="adm-shell sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-4 bg-adm-shell px-5 text-adm-on-shell">
-        <div className="flex min-w-0 items-center gap-3">
-          <a href="/" className="adm-focus rounded-md" aria-label="Voir le site public">
-            <PigmentMark className="h-7 w-7" />
-          </a>
-          <div className="flex min-w-0 items-baseline gap-2">
-            <h1 className="font-oswald text-[17px] font-bold leading-none tracking-[-0.01em] [font-stretch:112%]">
-              Admin
-            </h1>
-            <span className="hidden truncate text-[13px] text-adm-on-shell-2 sm:block">
-              Classement des projets{repoCount > 0 ? ` · ${repoCount} dépôts` : ''}
+      <header className="adm-shell sticky top-0 z-40 shrink-0 bg-adm-shell text-adm-on-shell">
+        <div className="flex h-14 items-center justify-between gap-4 px-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <a href="/" className="adm-focus rounded-md" aria-label="Voir le site public">
+              <PigmentMark className="h-7 w-7" />
+            </a>
+            <h1 className="font-oswald text-[17px] font-bold leading-none tracking-[-0.01em] [font-stretch:112%]">Admin</h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="adm-focus hidden rounded-full px-3 py-1.5 text-[13px] text-adm-on-shell-2 underline-offset-4 hover:text-adm-on-shell hover:underline md:inline"
+            >
+              Voir le site
+            </a>
+            {onSync && <GitHubSyncButton isSyncing={isSyncing} onSync={onSync} count={repoCount} />}
+            {actions}
+            <span className="mx-1 hidden h-5 w-px bg-adm-on-shell/25 sm:block" aria-hidden />
+            <span className="hidden max-w-[16ch] truncate text-[12px] text-adm-on-shell-2 lg:block" title={session.user.email ?? ''}>
+              {session.user.email}
             </span>
+            <Button variant="ghost-shell" size="sm" onClick={() => void signOut()}>
+              Déconnexion
+            </Button>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="adm-focus hidden rounded-full px-3 py-1.5 text-[13px] text-adm-on-shell-2 underline-offset-4 hover:text-adm-on-shell hover:underline md:inline"
-          >
-            Voir le site
-          </a>
-          <GitHubSyncButton isSyncing={isSyncing} onSync={onSync} count={repoCount} />
-          <span className="mx-1 hidden h-5 w-px bg-adm-on-shell/25 sm:block" aria-hidden />
-          <span className="hidden max-w-[16ch] truncate text-[12px] text-adm-on-shell-2 lg:block" title={session.user.email ?? ''}>
-            {session.user.email}
-          </span>
-          <Button variant="ghost-shell" size="sm" onClick={() => void signOut()}>
-            Déconnexion
-          </Button>
-        </div>
+        <nav aria-label="Sections de l'admin" className="flex gap-1 overflow-x-auto px-4">
+          {TABS.map((tab) => (
+            <NavLink
+              key={tab.to}
+              to={tab.to}
+              end={tab.end}
+              className={({ isActive }) =>
+                cn(
+                  'adm-focus shrink-0 rounded-t-lg px-3.5 py-2 text-[14px] font-medium transition-colors duration-150',
+                  isActive ? 'bg-adm-bg text-adm-ink' : 'text-adm-on-shell-2 hover:text-adm-on-shell',
+                )
+              }
+            >
+              {tab.label}
+            </NavLink>
+          ))}
+        </nav>
       </header>
 
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</main>
