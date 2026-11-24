@@ -1,0 +1,4 @@
+{
+  "prompt": "Origin: derived from public/peter.jpeg (owner-supplied portrait). Matte v3 (2026-11-23): union of (a) edge flood-fill on light-blue pixels (b-r>12, lum>140) and (b) flood-fill on light-blue AND smooth pixels (b-r>10, lum>175, 9px mean of 7px local std < 4.5) eroded 4px and limited to the cap zone; person = component connected to the face; close/open 5px, erode 3px, 1.6px... 1.4px Gaussian feather; RGBA WebP q88.",
+  "createdAt": "2026-11-23T15:16:05.350Z"
+}

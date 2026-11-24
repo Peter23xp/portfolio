@@ -100,6 +100,11 @@ export function KanbanBoard({ projects, onMove, onToggleFeatured, dragDisabled =
   return (
     <DndContext
       sensors={sensors}
+      accessibility={{
+        screenReaderInstructions: {
+          draggable: 'Pour déplacer un dépôt : espace pour le saisir, flèches pour le déplacer, espace pour le déposer, Échap pour annuler.',
+        },
+      }}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
@@ -108,14 +113,12 @@ export function KanbanBoard({ projects, onMove, onToggleFeatured, dragDisabled =
       <div className="flex flex-1 flex-col overflow-hidden min-h-0">
       {/* Notice: rendered outside the scroll container so it isn't clipped */}
       {dragDisabled && (
-        <div className="mb-2 flex items-center justify-center px-1">
-          <span className="rounded-md border border-adm-border bg-adm-surface px-2.5 py-1 text-[11px] text-adm-ink-3">
-            Désactiver les filtres pour réorganiser par glisser-déposer
-          </span>
-        </div>
+        <p role="status" className="mb-3 self-start rounded-full bg-adm-ink px-3.5 py-1.5 text-[13px] text-adm-bg">
+          Filtres actifs : le glisser-déposer est en pause. Réinitialise les filtres pour réorganiser.
+        </p>
       )}
       {/* Scroll horizontal natif — les colonnes ont une largeur fixe */}
-      <div className="flex flex-1 gap-3 overflow-x-auto pb-4 px-1 min-h-0">
+      <div className="adm-scrollbar flex min-h-0 flex-1 gap-4 overflow-x-auto px-1 pb-4">
         {CATEGORIES.map((category) => (
           <CategoryColumn
             key={category.id}

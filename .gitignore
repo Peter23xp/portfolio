@@ -25,3 +25,7 @@ dist-ssr
 .vercel
 .superpowers/
 *.bak
+
+# Impeccable : images de référence du catalogue (tierces) et fichiers de travail
+.impeccable/reference/
+.impeccable/decision-direction.json

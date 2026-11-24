@@ -9,27 +9,36 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        space: ['"Satoshi"', 'sans-serif'],
-        oswald: ['"Clash Display"', 'sans-serif'],
-        bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
+        // admin : texte d'interface en police système (nette en petite taille,
+        // accents lisibles) ; titres en Anybody, la voix du site.
+        space: ['ui-sans-serif', 'system-ui', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        oswald: ['"Anybody"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
-      // Palette admin — dark violet-tinted, Linear-inspired.
-      // Utiliser avec le préfixe `adm-` : bg-adm-bg, text-adm-ink-2, etc.
+      // Palette admin — monde « peau à chromatophores » (DESIGN.md), version outil.
+      // Zone de travail claire (manteau pigmenté), coque à l'encre, iridophore
+      // réservé à l'action principale. Contraste texte ≥ 4.5:1 sur card/surface.
       colors: {
         adm: {
-          bg:             'oklch(0.09 0.008 275)',
-          surface:        'oklch(0.125 0.009 275)',
-          card:           'oklch(0.155 0.010 275)',
-          'card-hover':   'oklch(0.185 0.011 275)',
-          border:         'oklch(0.225 0.009 275)',
-          'border-strong':'oklch(0.320 0.011 275)',
-          ink:            'oklch(0.96 0.004 275)',
-          'ink-2':        'oklch(0.76 0.007 275)',
-          'ink-3':        'oklch(0.56 0.007 275)',
-          accent:         'oklch(0.62 0.22 277)',
-          'accent-bright':'oklch(0.75 0.18 277)',
-          'accent-dim':   'oklch(0.62 0.22 277 / 0.12)',
-          'accent-border':'oklch(0.62 0.22 277 / 0.40)',
+          bg:             'oklch(0.948 0.018 28)',   // manteau
+          surface:        'oklch(0.915 0.026 30)',   // manteau-2 : colonnes, barres
+          card:           'oklch(0.978 0.010 28)',   // face des cartes
+          'card-hover':   'oklch(0.992 0.006 28)',
+          border:         'oklch(0.85 0.025 32)',
+          'border-strong':'oklch(0.74 0.035 33)',
+          ink:            'oklch(0.235 0.022 40 / <alpha-value>)',   // crête
+          'ink-2':        'oklch(0.36 0.040 35)',
+          'ink-3':        'oklch(0.44 0.045 35)',
+          accent:         'oklch(0.40 0.095 35 / <alpha-value>)',    // encre chromatique
+          'accent-bright':'oklch(0.33 0.080 34)',
+          'accent-dim':   'oklch(0.40 0.095 35 / 0.10)',
+          'accent-border':'oklch(0.40 0.095 35 / 0.45)',
+          shell:          'oklch(0.40 0.095 35 / <alpha-value>)',    // coque (barre du haut)
+          'on-shell':     'oklch(0.955 0.016 28 / <alpha-value>)',
+          'on-shell-2':   'oklch(0.86 0.040 32)',
+          iris:           'oklch(0.72 0.115 205 / <alpha-value>)',   // seule couleur d'accent
+          'iris-hi':      'oklch(0.80 0.100 200)',
+          'iris-deep':    'oklch(0.48 0.095 215)',
+          pigment:        'oklch(0.56 0.115 40)',
         },
       },
       keyframes: {

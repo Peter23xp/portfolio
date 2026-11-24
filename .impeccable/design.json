@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-23T14:47:13.492Z",
+  "title": "Design System: Peter Akilimali — Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Chroma Ink",
+        "canonical": "oklch(0.4 0.095 35)",
+        "tonalRamp": [
+          "oklch(0.15 0.039 35)",
+          "oklch(0.26 0.065 35)",
+          "oklch(0.37 0.084 35)",
+          "oklch(0.48 0.093 35)",
+          "oklch(0.59 0.094 35)",
+          "oklch(0.70 0.087 35)",
+          "oklch(0.82 0.069 35)",
+          "oklch(0.95 0.039 35)"
+        ]
+      },
+      "ink-deep": {
+        "role": "primary",
+        "displayName": "Deep Ink",
+        "canonical": "oklch(0.31 0.075 33)",
+        "tonalRamp": [
+          "oklch(0.15 0.031 33)",
+          "oklch(0.26 0.052 33)",
+          "oklch(0.37 0.066 33)",
+          "oklch(0.48 0.074 33)",
+          "oklch(0.59 0.075 33)",
+          "oklch(0.70 0.069 33)",
+          "oklch(0.82 0.055 33)",
+          "oklch(0.95 0.031 33)"
+        ]
+      },
+      "pigment": {
+        "role": "primary",
+        "displayName": "Light Pigment",
+        "canonical": "oklch(0.56 0.115 40)",
+        "tonalRamp": [
+          "oklch(0.15 0.047 40)",
+          "oklch(0.26 0.079 40)",
+          "oklch(0.37 0.101 40)",
+          "oklch(0.48 0.113 40)",
+          "oklch(0.59 0.114 40)",
+          "oklch(0.70 0.105 40)",
+          "oklch(0.82 0.084 40)",
+          "oklch(0.95 0.047 40)"
+        ]
+      },
+      "iris": {
+        "role": "secondary",
+        "displayName": "Iridophore Teal",
+        "canonical": "oklch(0.72 0.115 205)",
+        "tonalRamp": [
+          "oklch(0.15 0.047 205)",
+          "oklch(0.26 0.079 205)",
+          "oklch(0.37 0.101 205)",
+          "oklch(0.48 0.113 205)",
+          "oklch(0.59 0.114 205)",
+          "oklch(0.70 0.105 205)",
+          "oklch(0.82 0.084 205)",
+          "oklch(0.95 0.047 205)"
+        ]
+      },
+      "iris-hi": {
+        "role": "secondary",
+        "displayName": "Iridophore Bright",
+        "canonical": "oklch(0.8 0.1 200)",
+        "tonalRamp": [
+          "oklch(0.15 0.041 200)",
+          "oklch(0.26 0.069 200)",
+          "oklch(0.37 0.088 200)",
+          "oklch(0.48 0.098 200)",
+          "oklch(0.59 0.099 200)",
+          "oklch(0.70 0.092 200)",
+          "oklch(0.82 0.073 200)",
+          "oklch(0.95 0.041 200)"
+        ]
+      },
+      "iris-deep": {
+        "role": "secondary",
+        "displayName": "Iridophore Deep",
+        "canonical": "oklch(0.48 0.095 215)",
+        "tonalRamp": [
+          "oklch(0.15 0.039 215)",
+          "oklch(0.26 0.065 215)",
+          "oklch(0.37 0.084 215)",
+          "oklch(0.48 0.093 215)",
+          "oklch(0.59 0.094 215)",
+          "oklch(0.70 0.087 215)",
+          "oklch(0.82 0.069 215)",
+          "oklch(0.95 0.039 215)"
+        ]
+      },
+      "ridge": {
+        "role": "neutral",
+        "displayName": "Ridge",
+        "canonical": "oklch(0.235 0.022 40)",
+        "tonalRamp": [
+          "oklch(0.15 0.009 40)",
+          "oklch(0.26 0.015 40)",
+          "oklch(0.37 0.019 40)",
+          "oklch(0.48 0.022 40)",
+          "oklch(0.59 0.022 40)",
+          "oklch(0.70 0.020 40)",
+          "oklch(0.82 0.016 40)",
+          "oklch(0.95 0.009 40)"
+        ]
+      },
+      "mantle": {
+        "role": "neutral",
+        "displayName": "Mantle",
+        "canonical": "oklch(0.948 0.018 28)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 28)",
+          "oklch(0.26 0.012 28)",
+          "oklch(0.37 0.016 28)",
+          "oklch(0.48 0.018 28)",
+          "oklch(0.59 0.018 28)",
+          "oklch(0.70 0.017 28)",
+          "oklch(0.82 0.013 28)",
+          "oklch(0.95 0.008 28)"
+        ]
+      },
+      "mantle-2": {
+        "role": "neutral",
+        "displayName": "Mantle Shade",
+        "canonical": "oklch(0.915 0.026 30)",
+        "tonalRamp": [
+          "oklch(0.15 0.011 30)",
+          "oklch(0.26 0.018 30)",
+          "oklch(0.37 0.023 30)",
+          "oklch(0.48 0.026 30)",
+          "oklch(0.59 0.026 30)",
+          "oklch(0.70 0.024 30)",
+          "oklch(0.82 0.019 30)",
+          "oklch(0.95 0.011 30)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.8 0.03 32)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 32)",
+          "oklch(0.26 0.021 32)",
+          "oklch(0.37 0.026 32)",
+          "oklch(0.48 0.029 32)",
+          "oklch(0.59 0.030 32)",
+          "oklch(0.70 0.028 32)",
+          "oklch(0.82 0.022 32)",
+          "oklch(0.95 0.012 32)"
+        ]
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Muted Pigment Text",
+        "canonical": "oklch(0.43 0.05 35)",
+        "tonalRamp": [
+          "oklch(0.15 0.020 35)",
+          "oklch(0.26 0.034 35)",
+          "oklch(0.37 0.044 35)",
+          "oklch(0.48 0.049 35)",
+          "oklch(0.59 0.050 35)",
+          "oklch(0.70 0.046 35)",
+          "oklch(0.82 0.037 35)",
+          "oklch(0.95 0.020 35)"
+        ]
+      },
+      "on-ink": {
+        "role": "neutral",
+        "displayName": "On-Ink",
+        "canonical": "oklch(0.955 0.016 28)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 28)",
+          "oklch(0.26 0.011 28)",
+          "oklch(0.37 0.014 28)",
+          "oklch(0.48 0.016 28)",
+          "oklch(0.59 0.016 28)",
+          "oklch(0.70 0.015 28)",
+          "oklch(0.82 0.012 28)",
+          "oklch(0.95 0.008 28)"
+        ]
+      },
+      "on-ink-2": {
+        "role": "neutral",
+        "displayName": "On-Ink Muted",
+        "canonical": "oklch(0.86 0.04 32)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 32)",
+          "oklch(0.26 0.028 32)",
+          "oklch(0.37 0.035 32)",
+          "oklch(0.48 0.039 32)",
+          "oklch(0.59 0.040 32)",
+          "oklch(0.70 0.037 32)",
+          "oklch(0.82 0.029 32)",
+          "oklch(0.95 0.016 32)"
+        ]
+      },
+      "on-ridge-2": {
+        "role": "neutral",
+        "displayName": "On-Ridge Muted",
+        "canonical": "oklch(0.8 0.03 35)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 35)",
+          "oklch(0.26 0.021 35)",
+          "oklch(0.37 0.026 35)",
+          "oklch(0.48 0.029 35)",
+          "oklch(0.59 0.030 35)",
+          "oklch(0.70 0.028 35)",
+          "oklch(0.82 0.022 35)",
+          "oklch(0.95 0.012 35)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero name, close title, feature name; wdth 118%."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section H2s in ridge; wdth 110%."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "H3s, activity heading, domain and dialog titles; wdth 106%."
+      },
+      "item": {
+        "displayName": "Item",
+        "purpose": "Project names and journey step titles; wdth 104%."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text on mantle, ink and ridge."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Section intro copy in text-2, max 40rem."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase inline field labels only (facts terms, Stack)."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Raw README text in the dialog."
+      }
+    },
+    "shadows": [
+      {
+        "name": "device-lift",
+        "value": "0 10px 20px oklch(0.2 0.05 35 / 0.45)",
+        "purpose": "App screenshots only, paired with a 1px on-ink 25% outline."
+      },
+      {
+        "name": "dialog-backdrop",
+        "value": "oklch(0.2 0.03 35 / 0.72)",
+        "purpose": "Ridge wash behind the native dialog; no blur."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "House ease for transitions and keyframes."
+      },
+      {
+        "name": "state",
+        "value": "0.2s",
+        "purpose": "Colour and border state changes on buttons, chips, links."
+      },
+      {
+        "name": "switch",
+        "value": "0.35s fill, 0.45s dot",
+        "purpose": "Context switch option fill and dot dilation."
+      },
+      {
+        "name": "dilate",
+        "value": "0.45s, 18ms stagger per dot",
+        "purpose": "Pigment glyph dots scale to 1.3 on row hover."
+      },
+      {
+        "name": "pigment-in",
+        "value": "1.5s",
+        "purpose": "Hero name enters from weight 300 / wdth 78% to 760 / 118%."
+      },
+      {
+        "name": "pigment-pulse",
+        "value": "0.9s",
+        "purpose": "Hero name contracts to 480 / 92% on context change."
+      },
+      {
+        "name": "iris-flash",
+        "value": "2.8s infinite",
+        "purpose": "Availability signal ring expands to 2.6x and fades."
+      },
+      {
+        "name": "view-transition",
+        "value": "0.65s",
+        "purpose": "Section reorder on context change; hero excluded."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Dilation, flash, spread and smooth scroll are gated; canvas falls back to the static portrait."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tablet",
+        "value": "1080px"
+      },
+      {
+        "name": "mobile",
+        "value": "767px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one iridophore action per view.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 256 256\" fill=\"currentColor\"><path d=\"M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8Zm-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19Z\"/></svg>Écrire un e-mail</a>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:.6rem;padding:.95rem 1.5rem;border-radius:999px;background:oklch(0.72 0.115 205);color:oklch(0.235 0.022 40);font-family:Anybody,ui-sans-serif,system-ui,sans-serif;font-weight:650;text-decoration:none;transition:background-color .2s,transform .2s cubic-bezier(0.16,1,0.3,1)}.ds-btn-primary:hover{background:oklch(0.80 0.10 200)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid oklch(0.48 0.095 215);outline-offset:3px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action on mantle (load more).",
+      "html": "<button class=\"ds-btn-outline\">Voir plus</button>",
+      "css": ".ds-btn-outline{padding:.8rem 1.3rem;border-radius:999px;border:1px solid oklch(0.235 0.022 40);background:none;color:oklch(0.235 0.022 40);font:620 1.0625rem Anybody,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:background-color .2s,color .2s}.ds-btn-outline:hover{background:oklch(0.235 0.022 40);color:oklch(0.948 0.018 28)}.ds-btn-outline:focus-visible{outline:2px solid oklch(0.48 0.095 215);outline-offset:3px}"
+    },
+    {
+      "name": "Pill on Ink",
+      "kind": "button",
+      "refersTo": "pill-on-ink",
+      "description": "Outlined pill on ink fields; inverts on hover.",
+      "html": "<div class=\"ds-ink-ground\"><a class=\"ds-pill\" href=\"#\">App Store</a></div>",
+      "css": ".ds-ink-ground{background:oklch(0.40 0.095 35);padding:1.5rem}.ds-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.1rem;border-radius:999px;border:1px solid color-mix(in oklch,oklch(0.955 0.016 28) 50%,transparent);color:oklch(0.955 0.016 28);font:600 1rem Anybody,ui-sans-serif,system-ui,sans-serif;text-decoration:none;transition:background-color .2s,color .2s}.ds-pill:hover{background:oklch(0.955 0.016 28);color:oklch(0.40 0.095 35)}.ds-pill:focus-visible{outline:2px solid oklch(0.80 0.10 200);outline-offset:3px}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Project category filter with tabular count.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-checked=\"true\">Tous <span class=\"ds-chip__n\">24</span></button><button class=\"ds-chip\" aria-checked=\"false\">Livrés <span class=\"ds-chip__n\">6</span></button></div>",
+      "css": ".ds-chips{display:flex;gap:.5rem;background:oklch(0.948 0.018 28);padding:1rem}.ds-chip{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem .95rem;border-radius:999px;border:1px solid oklch(0.80 0.03 32);background:none;color:oklch(0.235 0.022 40);font:560 .9375rem Anybody,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:background-color .2s,color .2s,border-color .2s}.ds-chip:hover{border-color:oklch(0.40 0.095 35)}.ds-chip[aria-checked=\"true\"]{background:oklch(0.235 0.022 40);border-color:oklch(0.235 0.022 40);color:oklch(0.948 0.018 28)}.ds-chip__n{font-size:.8125rem;font-variant-numeric:tabular-nums;opacity:.75}.ds-chip:focus-visible{outline:2px solid oklch(0.48 0.095 215);outline-offset:3px}"
+    },
+    {
+      "name": "Context Switch",
+      "kind": "custom",
+      "refersTo": "context-switch-track",
+      "description": "Signature two-state switch that re-patterns the skin.",
+      "html": "<div class=\"ds-ink-ground\"><div class=\"ds-switch\"><button class=\"ds-switch__opt\" aria-pressed=\"true\"><span class=\"ds-dot\"></span>Je recrute</button><button class=\"ds-switch__opt\" aria-pressed=\"false\"><span class=\"ds-dot\"></span>J'ai un projet</button></div></div>",
+      "css": ".ds-ink-ground{background:oklch(0.40 0.095 35);padding:1.5rem}.ds-switch{display:inline-flex;padding:4px;gap:4px;border-radius:999px;background:oklch(0.31 0.075 33)}.ds-switch__opt{display:inline-flex;align-items:center;gap:.55rem;padding:.7rem 1.15rem;border-radius:999px;border:0;background:none;color:oklch(0.955 0.016 28);font:600 1rem Anybody,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:background-color .35s cubic-bezier(0.16,1,0.3,1),color .35s cubic-bezier(0.16,1,0.3,1)}.ds-switch__opt:hover{background:color-mix(in oklch,oklch(0.955 0.016 28) 12%,transparent)}.ds-switch__opt[aria-pressed=\"true\"]{background:oklch(0.955 0.016 28);color:oklch(0.31 0.075 33)}.ds-dot{width:.55rem;height:.55rem;border-radius:50%;background:currentColor;transform:scale(.6);transition:transform .45s cubic-bezier(0.16,1,0.3,1)}.ds-switch__opt[aria-pressed=\"true\"] .ds-dot{transform:scale(1.15)}.ds-switch__opt:focus-visible{outline:2px solid oklch(0.80 0.10 200);outline-offset:3px}"
+    },
+    {
+      "name": "Project Row",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Ruled project row led by a pigment dot glyph that dilates on hover.",
+      "html": "<div class=\"ds-row\"><svg class=\"ds-glyph\" viewBox=\"0 0 48 48\"><circle cx=\"6\" cy=\"6\" r=\"3.2\"/><circle cx=\"15\" cy=\"6\" r=\"3.8\"/><circle cx=\"24\" cy=\"6\" r=\"2.9\"/><circle cx=\"33\" cy=\"6\" r=\"3.4\"/><circle cx=\"10.5\" cy=\"15\" r=\"3.5\"/><circle cx=\"19.5\" cy=\"15\" r=\"3.0\"/><circle cx=\"28.5\" cy=\"15\" r=\"3.9\"/><circle cx=\"6\" cy=\"24\" r=\"3.1\"/><circle cx=\"15\" cy=\"24\" r=\"3.6\"/><circle cx=\"24\" cy=\"24\" r=\"3.3\"/><circle cx=\"33\" cy=\"24\" r=\"2.8\"/></svg><div><div class=\"ds-row__name\">Progress Business</div><div class=\"ds-row__desc\">ERP/CRM pour PME.</div></div><span class=\"ds-row__kind\">Livré</span></div>",
+      "css": ".ds-row{display:grid;grid-template-columns:3rem 1fr auto;gap:1rem 1.75rem;align-items:center;padding:1.4rem .75rem;border-block:1px solid oklch(0.80 0.03 32);background:oklch(0.948 0.018 28);color:oklch(0.235 0.022 40);font-family:Anybody,ui-sans-serif,system-ui,sans-serif;transition:background-color .25s}.ds-row:hover{background:oklch(0.915 0.026 30)}.ds-glyph{width:3rem;height:3rem;fill:oklch(0.40 0.095 35);overflow:visible}.ds-glyph circle{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(0.16,1,0.3,1)}.ds-row:hover .ds-glyph circle{transform:scale(1.3)}.ds-row__name{font-size:1.25rem;font-weight:660;font-stretch:104%;letter-spacing:-.01em}.ds-row__desc{margin-top:.3rem;color:oklch(0.43 0.05 35)}.ds-row__kind{color:oklch(0.40 0.095 35);font-weight:650}"
+    },
+    {
+      "name": "Feature Cell",
+      "kind": "card",
+      "refersTo": "feature-cell",
+      "description": "The only card: ink cell for the flagship product.",
+      "html": "<article class=\"ds-feature\"><h3 class=\"ds-feature__name\">Chadito</h3><p class=\"ds-feature__tag\">Disponible sur iOS, Android et web.</p><dl class=\"ds-facts\"><div><dt>Stack</dt><dd>React Native</dd></div></dl></article>",
+      "css": ".ds-feature{background:oklch(0.40 0.095 35);color:oklch(0.955 0.016 28);border-radius:16px;padding:clamp(1.75rem,4.5vw,4rem);font-family:Anybody,ui-sans-serif,system-ui,sans-serif}.ds-feature__name{margin:0;font-size:clamp(2.5rem,4.4vw,3.75rem);line-height:1;font-weight:780;font-stretch:118%;letter-spacing:-.03em}.ds-feature__tag{margin:1.5rem 0 0;font-size:1.375rem;font-weight:600}.ds-facts{margin:1.75rem 0 0}.ds-facts dt{font-size:.8125rem;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.86 0.04 32)}.ds-facts dd{margin:.2rem 0 0;font-weight:620}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Discreet on-ink nav over the hero field.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\">Projets</a><a href=\"#\">Expertise</a><a href=\"#\">Parcours</a><span class=\"ds-nav__tools\"><span class=\"ds-lang\"><b>FR</b> EN</span><a class=\"ds-nav__cv\" href=\"#\">CV</a></span></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:1.75rem;padding:1.25rem 1.5rem;background:oklch(0.40 0.095 35);color:oklch(0.955 0.016 28);font:520 1.0625rem Anybody,ui-sans-serif,system-ui,sans-serif}.ds-nav>a{color:inherit;text-decoration:none;padding-block:.25rem;border-bottom:1px solid transparent;transition:border-color .2s}.ds-nav>a:hover{border-color:currentColor}.ds-nav a:focus-visible{outline:2px solid oklch(0.80 0.10 200);outline-offset:3px}.ds-nav__tools{margin-left:auto;display:flex;align-items:center;gap:1.25rem}.ds-lang{font-size:.875rem;font-weight:600;letter-spacing:.04em}.ds-lang b{text-decoration:underline;text-underline-offset:.3em}.ds-nav__cv{color:inherit;font-weight:600;text-decoration:none;padding:.45rem .95rem;border:1px solid color-mix(in oklch,oklch(0.955 0.016 28) 45%,transparent);border-radius:999px;transition:background-color .2s,color .2s}.ds-nav__cv:hover{background:oklch(0.955 0.016 28);color:oklch(0.40 0.095 35)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Living Skin",
+    "overview": "The public portfolio is a cephalopod skin. Pigment ink sits against a light mantle, and the surface re-patterns when the visitor states their context (\"Je recrute / J'ai un projet\"). The first viewport is drenched in chroma ink, and the portrait is rendered as a chromatophore halftone on canvas that dilates into the real photo around the pointer. Reading sections fall back to a warm, pigment-tinted mantle. The close returns to the dark ridge. Pages read as three skin states: ink, mantle, ridge.\n\nColour comes in flat fields that never blend. The only texture is the chromatophore dot, which appears as the hero canvas, the dot fields behind the Chadito screenshots and at the top of the close, the SVG project glyphs, the expertise swatches, the journey wave and the GitHub activity grid. One variable sans (Anybody) carries the hierarchy, and its weight and width move together the way pigment expands. A single teal iridophore flash is kept for \"available\" and the primary action.\n\nThis world rejects the dark developer portfolio with a neon accent and the split hero with text left, photo right and cards below. The private admin panel is out of scope and keeps its own violet `adm-` system in `tailwind.config.js`.",
+    "keyCharacteristics": [
+      "Three flat skin states: ink hero, mantle reading sections, ridge close.",
+      "Dots are the only texture, and every data visual is drawn in dots.",
+      "One variable sans, with display weight and width rising together.",
+      "Exactly one cool accent (iridophore teal) in a warm, monochrome-hue palette.",
+      "Rows and hairlines instead of cards, and rounded pills for actions."
+    ],
+    "rules": [
+      {
+        "name": "The One Flash Rule",
+        "body": "Iridophore teal marks only \"available\" and the primary action, with one filled teal button per viewport. Every other emphasis uses ink or ridge.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat Field Rule",
+        "body": "Fields are solid colour. A gradient may only appear as an alpha mask that fades a dot field, never as a colour fill. Glass and backdrop blur are not used.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted Mantle Rule",
+        "body": "Light surfaces always carry the ink hue (hue 28–30, chroma 0.018 or more). A neutral grey or cream ground breaks the skin.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dilation Rule",
+        "body": "Weight and width rise together. The larger the type, the heavier and wider it gets (104% → 106% → 110% → 118%), and tracking tightens as it grows (−0.01em → −0.03em). The hero name animates in from 300/78% to 760/118%, and it pulses to 480/92% when the context changes.",
+        "section": "typography"
+      },
+      {
+        "name": "The Short Caps Rule",
+        "body": "Wide-tracked uppercase is only for labels of one or two words that sit inline with their value. It never sits above a heading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Step Rule",
+        "body": "Hover and grouping use mantle-2 fills or a full inversion to ridge or on-ink, never a shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** build every texture and data visual from circular ink dots (glyphs, swatches, wave, activity grid, halftone).",
+      "**Do** keep the three-state rhythm: the ink hero, mantle reading sections (with a mantle-2 band to separate them) and the ridge close.",
+      "**Do** raise weight and width together for larger type (Anybody wdth 104–118%) and tighten tracking as size grows.",
+      "**Do** use the house ease `cubic-bezier(0.16, 1, 0.3, 1)` for movement, and gate dilation, flashes and spreads behind `prefers-reduced-motion: no-preference`.",
+      "**Do** use Phosphor and Simple Icons as inline SVG, at 1em.",
+      "**Do** mirror any token used in canvas code as an sRGB constant that matches the OKLCH source."
+    ],
+    "donts": [
+      "**Don't** use iridophore teal for anything except \"available\" and the primary action.",
+      "**Don't** fill surfaces with gradients, glass or blur. Gradients may only mask a dot field.",
+      "**Don't** set the mantle to neutral grey or cream. It always carries the ink hue.",
+      "**Don't** add shadows to UI surfaces. The device-lift shadow belongs to app screenshots only.",
+      "**Don't** put an uppercase label or kicker above a heading. Tracked caps are only for inline field labels.",
+      "**Don't** set text on the light pigment tone."
+    ]
+  }
+}

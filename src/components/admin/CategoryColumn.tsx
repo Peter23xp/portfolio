@@ -1,19 +1,23 @@
 // src/components/admin/CategoryColumn.tsx
+// Colonne de catégorie : glyphe de pigment (même vocabulaire que le site),
+// rappel de ce que la catégorie devient sur le site, zone de dépôt.
 
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
+import { CategoryGlyph } from './CategoryGlyph'
 import { ProjectCard } from './ProjectCard'
 import { cn } from '../../lib/utils'
 import type { CategoryMeta, PortfolioProject, ProjectCategory } from '../../types/portfolio'
 
-const CATEGORY_DOT: Record<ProjectCategory, string> = {
-  non_classe:   'oklch(0.50 0.006 275)',
-  livre:        'oklch(0.72 0.17 145)',
-  hackathon:    'oklch(0.80 0.17 70)',
-  personnel:    'oklch(0.65 0.16 230)',
-  contribution: 'oklch(0.70 0.15 185)',
-  cache:        'oklch(0.60 0.16 25)',
+// Ce que la catégorie produit sur le site public.
+const CATEGORY_HINT: Record<ProjectCategory, string> = {
+  non_classe: 'À classer · affiché dans « Autres dépôts »',
+  livre: 'Filtre « Livrés » du site',
+  hackathon: 'Filtre « Hackathon & Web3 »',
+  personnel: 'Filtre « Personnels »',
+  contribution: 'Filtre « Contributions »',
+  cache: 'Jamais affiché sur le site',
 }
 
 interface CategoryColumnProps {
@@ -24,55 +28,34 @@ interface CategoryColumnProps {
 }
 
 export function CategoryColumn({ category, projects, onToggleFeatured, dragDisabled = false }: CategoryColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: category.id,
-    data: { category: category.id },
-  })
-
-  const dot = CATEGORY_DOT[category.id]
+  const { setNodeRef, isOver } = useDroppable({ id: category.id, data: { category: category.id } })
   const isEmpty = projects.length === 0
+  const headingId = `col-${category.id}`
 
   return (
-    <div className="flex h-full w-[260px] shrink-0 flex-col min-h-0">
-      {/* ── Header ──────────────────────────────────────────────── */}
-      <div className="mb-2 flex items-center justify-between gap-2 px-1">
-        <div className="flex items-center gap-2 min-w-0">
-          <span
-            aria-hidden
-            className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
-            style={{ backgroundColor: dot }}
-          />
-          <span className="truncate text-[11px] font-semibold uppercase tracking-wide text-adm-ink-3 leading-none">
-            {category.label}
-          </span>
+    <section aria-labelledby={headingId} className="flex h-full w-[284px] shrink-0 flex-col min-h-0">
+      <header className="mb-2.5 flex items-start gap-2.5 px-1">
+        <CategoryGlyph category={category.id} active={isOver} className="mt-0.5" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 id={headingId} className="truncate font-oswald text-[15px] font-semibold leading-tight text-adm-ink">
+              {category.label}
+            </h2>
+            <span className="shrink-0 text-[13px] font-medium tabular-nums text-adm-ink-2">{projects.length}</span>
+          </div>
+          <p className="mt-0.5 truncate text-[12px] leading-snug text-adm-ink-3">{CATEGORY_HINT[category.id]}</p>
         </div>
-        <span
-          className={cn(
-            'shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium leading-none tabular-nums',
-            'bg-adm-surface text-adm-ink-3',
-            projects.length > 0 && 'bg-adm-card text-adm-ink-2',
-          )}
-        >
-          {projects.length}
-        </span>
-      </div>
+      </header>
 
-      {/* ── Drop zone ───────────────────────────────────────────── */}
       <div
         ref={setNodeRef}
         className={cn(
-          'flex flex-1 flex-col gap-1 rounded-xl border p-1.5',
-          'overflow-y-auto adm-scrollbar min-h-0',
-          'transition-all duration-150',
-          isOver
-            ? 'border-adm-accent-border bg-adm-accent-dim'
-            : 'bg-adm-surface border-adm-border',
+          'adm-scrollbar flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto rounded-xl border p-1.5',
+          'transition-[background-color,border-color] duration-200',
+          isOver ? 'border-adm-accent bg-adm-accent-dim' : 'border-transparent bg-adm-surface',
         )}
       >
-        <SortableContext
-          items={projects.map((p) => p.github_id)}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={projects.map((p) => p.github_id)} strategy={verticalListSortingStrategy}>
           {projects.map((project) => (
             <ProjectCard
               key={project.github_id}
@@ -83,26 +66,20 @@ export function CategoryColumn({ category, projects, onToggleFeatured, dragDisab
           ))}
         </SortableContext>
 
-        {/* Empty / drop hint */}
         {(isEmpty || isOver) && (
           <div
             className={cn(
-              'flex flex-1 items-center justify-center rounded-lg border border-dashed',
-              'min-h-[56px] transition-colors duration-150',
-              isOver
-                ? 'border-adm-accent-border'
-                : 'border-adm-border',
+              'flex min-h-[64px] flex-1 items-center justify-center rounded-lg border border-dashed px-3 text-center',
+              'transition-colors duration-200',
+              isOver ? 'border-adm-accent text-adm-accent' : 'border-adm-border-strong text-adm-ink-3',
             )}
           >
-            <span className={cn(
-              'text-[10px] font-medium leading-none',
-              isOver ? 'text-adm-accent-bright' : 'text-adm-ink-3',
-            )}>
-              {isOver ? '↓ Déposer' : isEmpty ? 'Vide' : ''}
+            <span className="text-[13px] font-medium leading-snug">
+              {isOver ? 'Déposer ici' : 'Glisse un dépôt ici'}
             </span>
           </div>
         )}
       </div>
-    </div>
+    </section>
   )
 }

@@ -57,3 +57,48 @@ export function signInWithEmail(
 export function signOut(): Promise<{ error: AuthError | null }> {
   return supabase.auth.signOut().then(({ error }) => ({ error }))
 }
+
+// Mot de passe oublié : Supabase envoie un lien qui ramène sur /login en mode
+// « récupération » (l'URL de redirection doit figurer dans
+// Authentication → URL Configuration → Redirect URLs du projet Supabase).
+export function requestPasswordReset(email: string): Promise<{ error: AuthError | null }> {
+  return supabase.auth
+    .resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/login` })
+    .then(({ error }) => ({ error }))
+}
+
+// Définit un nouveau mot de passe (session de récupération active).
+export function updatePassword(password: string): Promise<{ error: AuthError | null }> {
+  return supabase.auth.updateUser({ password }).then(({ error }) => ({ error }))
+}
+
+// Le lien de récupération ouvre une session spéciale : on la détecte pour
+// afficher le formulaire « nouveau mot de passe » au lieu de rediriger.
+export function useRecoveryMode(): boolean {
+  const [recovery, setRecovery] = useState(
+    () => typeof window !== 'undefined' && /type=recovery/.test(window.location.hash),
+  )
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') setRecovery(true)
+    })
+    return () => sub.subscription.unsubscribe()
+  }, [])
+  return recovery
+}
+
+// Messages Supabase → français, avec la marche à suivre.
+export function authErrorMessage(error: AuthError | Error | null): string {
+  const msg = error?.message ?? ''
+  if (/invalid login credentials/i.test(msg))
+    return 'Email ou mot de passe incorrect. Utilise « Mot de passe oublié » pour le réinitialiser.'
+  if (/email not confirmed/i.test(msg))
+    return 'Email pas encore confirmé. Ouvre le lien reçu par email, ou confirme le compte dans Supabase.'
+  if (/rate limit|too many/i.test(msg))
+    return 'Trop de tentatives. Attends une minute puis réessaie.'
+  if (/password should be at least|weak password/i.test(msg))
+    return 'Mot de passe trop court : 8 caractères minimum.'
+  if (/failed to fetch|network/i.test(msg))
+    return 'Supabase injoignable. Vérifie ta connexion.'
+  return msg || 'Erreur inattendue.'
+}

@@ -23,7 +23,7 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
 
 function SearchIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
   )
@@ -73,10 +73,9 @@ function formatRelative(date: Date, now: number): string {
 }
 
 const selectBase = cn(
-  'h-7 rounded-md border px-2 text-[12px] leading-none',
-  'bg-adm-surface border-adm-border text-adm-ink',
-  'focus:outline-none focus:border-adm-accent',
-  'transition-colors duration-100',
+  'adm-focus h-9 rounded-full border px-3.5 text-[13px] leading-none font-space',
+  'bg-adm-card border-adm-border-strong text-adm-ink hover:border-adm-accent',
+  'transition-colors duration-150 cursor-pointer',
   // Reset browser default select styling
   'appearance-none',
 )
@@ -95,11 +94,11 @@ function StyledSelect({ value, onChange, 'aria-label': ariaLabel, children }: St
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={ariaLabel}
-        className={cn(selectBase, 'pr-6')}
+        className={cn(selectBase, 'pr-8')}
       >
         {children}
       </select>
-      <span className="pointer-events-none absolute right-1.5 text-adm-ink-3">
+      <span className="pointer-events-none absolute right-3 text-adm-ink-2">
         <ChevronIcon />
       </span>
     </div>
@@ -127,26 +126,25 @@ export function FilterBar({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-2 px-4 py-2',
+        'flex flex-wrap items-center gap-2 px-5 py-3',
         'border-b border-adm-border bg-adm-bg',
       )}
     >
       {/* ── Recherche ─────────────────────────────────────────── */}
       <div className="relative flex items-center">
-        <span className="pointer-events-none absolute left-2.5 text-adm-ink-3">
+        <span className="pointer-events-none absolute left-3.5 text-adm-ink-2">
           <SearchIcon />
         </span>
         <input
           type="search"
           value={filters.search}
           onChange={(e) => onChange({ ...filters, search: e.target.value })}
-          placeholder="Rechercher…"
-          aria-label="Rechercher un repo"
+          placeholder="Rechercher un dépôt…"
+          aria-label="Rechercher un dépôt"
           className={cn(
-            'h-7 w-44 rounded-md border pl-7 pr-2 text-[12px] leading-none',
-            'bg-adm-surface border-adm-border text-adm-ink placeholder:text-adm-ink-3',
-            'focus:outline-none focus:border-adm-accent',
-            'transition-colors duration-100',
+            'adm-focus h-9 w-56 rounded-full border pl-9 pr-3 text-[13px] leading-none font-space',
+            'bg-adm-card border-adm-border-strong text-adm-ink placeholder:text-adm-ink-3',
+            'hover:border-adm-accent transition-colors duration-150',
           )}
         />
       </div>
@@ -158,7 +156,7 @@ export function FilterBar({
           onChange={(v) => onChange({ ...filters, language: v })}
           aria-label="Filtrer par langage"
         >
-          <option value="">Tous langages</option>
+          <option value="">Tous les langages</option>
           {languages.map((lang) => (
             <option key={lang} value={lang}>{lang}</option>
           ))}
@@ -171,22 +169,22 @@ export function FilterBar({
         onClick={() => onChange({ ...filters, onlyFeatured: !filters.onlyFeatured })}
         aria-pressed={filters.onlyFeatured}
         className={cn(
-          'flex h-7 items-center gap-1.5 rounded-md border px-2.5',
-          'text-[12px] leading-none transition-colors duration-100',
+          'adm-focus flex h-9 items-center gap-1.5 rounded-full border px-3.5',
+          'text-[13px] font-medium leading-none transition-colors duration-150',
           filters.onlyFeatured
-            ? 'border-adm-accent-border bg-adm-accent-dim text-adm-accent-bright'
-            : 'border-adm-border bg-adm-surface text-adm-ink-2 hover:border-adm-border-strong hover:text-adm-ink',
+            ? 'border-adm-ink bg-adm-ink text-adm-bg'
+            : 'border-adm-border-strong bg-adm-card text-adm-ink hover:border-adm-accent',
         )}
       >
         <StarIcon />
-        Featured
+        Mis en avant
       </button>
 
       {/* ── Tri ───────────────────────────────────────────────── */}
       <StyledSelect
         value={filters.sortBy}
         onChange={(v) => onChange({ ...filters, sortBy: v as SortBy })}
-        aria-label="Trier les repos"
+        aria-label="Trier les dépôts"
       >
         {SORT_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -200,13 +198,12 @@ export function FilterBar({
           onClick={() => onChange(DEFAULT_FILTERS)}
           aria-label="Réinitialiser les filtres"
           className={cn(
-            'flex h-7 items-center gap-1 rounded-md border px-2',
-            'border-adm-border bg-adm-surface text-[11px] text-adm-ink-3',
-            'hover:border-adm-border-strong hover:text-adm-ink transition-colors duration-100',
+            'adm-focus flex h-9 items-center gap-1.5 rounded-full px-3',
+            'text-[13px] font-medium text-adm-accent underline-offset-4 hover:underline transition-colors duration-150',
           )}
         >
           <XIcon />
-          Reset
+          Réinitialiser
         </button>
       )}
 
@@ -216,13 +213,13 @@ export function FilterBar({
       {/* ── Compteur + dernière sync ───────────────────────────── */}
       <div className="flex items-center gap-3">
         {showCount && (
-          <span className="text-[11px] text-adm-ink-3 tabular-nums">
+          <span className="text-[13px] font-medium text-adm-ink-2 tabular-nums">
             {filteredCount} / {totalCount}
           </span>
         )}
         {lastSyncedAt && (
-          <span className="text-[11px] text-adm-ink-3" title={lastSyncedAt.toLocaleString()}>
-            Sync {formatRelative(lastSyncedAt, now)}
+          <span className="text-[13px] text-adm-ink-3" title={lastSyncedAt.toLocaleString()}>
+            Dernière synchro {formatRelative(lastSyncedAt, now)}
           </span>
         )}
       </div>

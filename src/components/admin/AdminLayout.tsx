@@ -1,4 +1,6 @@
 // src/components/admin/AdminLayout.tsx
+// Coque de l'admin : barre à l'encre (comme le héro du site), zone de travail
+// en manteau pigmenté. L'action principale (Sync) est la seule en iridophore.
 
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
@@ -7,7 +9,6 @@ import { Toaster } from 'sonner'
 import { GitHubSyncButton } from './GitHubSyncButton'
 import { Button } from '../ui/button'
 import { signOut, useSession } from '../../lib/auth-client'
-import { cn } from '../../lib/utils'
 
 interface AdminLayoutProps {
   children: ReactNode
@@ -16,10 +17,25 @@ interface AdminLayoutProps {
   repoCount: number
 }
 
-function LoadingSkeleton() {
+// même marque que la navigation du site : un amas de chromatophores
+export function PigmentMark({ className = '' }: { className?: string }) {
   return (
-    <div className="admin-root flex items-center justify-center">
-      <div className="h-1 w-24 rounded-full bg-adm-border animate-pulse" />
+    <svg viewBox="0 0 28 28" aria-hidden className={className} fill="currentColor">
+      <circle cx="8" cy="8" r="4" />
+      <circle cx="19" cy="7" r="2.6" />
+      <circle cx="9" cy="19" r="2.2" />
+      <circle cx="19.5" cy="18.5" r="5" />
+    </svg>
+  )
+}
+
+function LoadingShell() {
+  return (
+    <div className="admin-root">
+      <div className="adm-shell h-14 shrink-0 bg-adm-shell" />
+      <div className="flex flex-1 items-center justify-center" role="status" aria-label="Chargement de la session">
+        <div className="h-1.5 w-28 rounded-full bg-adm-surface motion-safe:animate-pulse" />
+      </div>
     </div>
   )
 }
@@ -27,72 +43,59 @@ function LoadingSkeleton() {
 export function AdminLayout({ children, isSyncing, onSync, repoCount }: AdminLayoutProps) {
   const { data: session, isPending } = useSession()
 
-  if (isPending) return <LoadingSkeleton />
+  if (isPending) return <LoadingShell />
   if (!session) return <Navigate to="/login" replace />
 
   return (
     <div className="admin-root">
       <Toaster
-        theme="dark"
+        theme="light"
         toastOptions={{
           classNames: {
-            toast: 'bg-adm-card border-adm-border text-adm-ink font-space text-[13px]',
+            toast: 'bg-adm-card border border-adm-border text-adm-ink font-space text-[14px]',
             description: 'text-adm-ink-2',
-            actionButton: 'bg-adm-accent text-adm-ink',
+            actionButton: 'bg-adm-ink text-adm-bg',
           },
         }}
         position="bottom-right"
-        richColors
       />
 
-      <header
-        className={cn(
-          'sticky top-0 z-40 flex h-12 shrink-0 items-center justify-between gap-4 px-4',
-          'border-b border-adm-border bg-adm-bg/95 backdrop-blur-md',
-        )}
-      >
-        {/* ── Branding ─────────────────────────────────────────── */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div
-            className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md bg-adm-accent text-[11px] font-bold text-white tracking-tight"
-            aria-hidden
-          >
-            PA
-          </div>
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="font-oswald text-[14px] font-semibold tracking-tight text-adm-ink leading-none">
+      <header className="adm-shell sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-4 bg-adm-shell px-5 text-adm-on-shell">
+        <div className="flex min-w-0 items-center gap-3">
+          <a href="/" className="adm-focus rounded-md" aria-label="Voir le site public">
+            <PigmentMark className="h-7 w-7" />
+          </a>
+          <div className="flex min-w-0 items-baseline gap-2">
+            <h1 className="font-oswald text-[17px] font-bold leading-none tracking-[-0.01em] [font-stretch:112%]">
               Admin
-            </span>
-            <span className="text-adm-border-strong text-[13px] leading-none">/</span>
-            <span className="hidden sm:block text-[12px] text-adm-ink-3 leading-none truncate">
-              Portfolio
+            </h1>
+            <span className="hidden truncate text-[13px] text-adm-on-shell-2 sm:block">
+              Classement des projets{repoCount > 0 ? ` · ${repoCount} dépôts` : ''}
             </span>
           </div>
-          {repoCount > 0 && (
-            <span className="hidden sm:inline-flex items-center rounded-full border border-adm-border bg-adm-surface px-2 py-0.5 text-[10px] tabular-nums text-adm-ink-3 leading-none">
-              {repoCount}
-            </span>
-          )}
         </div>
 
-        {/* ── Actions ──────────────────────────────────────────── */}
-        <div className="flex items-center gap-1.5">
-          <GitHubSyncButton isSyncing={isSyncing} onSync={onSync} count={repoCount} />
-          <div className="mx-1 h-4 w-px bg-adm-border" aria-hidden />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => void signOut()}
-            className="text-adm-ink-3 hover:text-adm-ink"
+        <div className="flex items-center gap-2">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="adm-focus hidden rounded-full px-3 py-1.5 text-[13px] text-adm-on-shell-2 underline-offset-4 hover:text-adm-on-shell hover:underline md:inline"
           >
+            Voir le site
+          </a>
+          <GitHubSyncButton isSyncing={isSyncing} onSync={onSync} count={repoCount} />
+          <span className="mx-1 hidden h-5 w-px bg-adm-on-shell/25 sm:block" aria-hidden />
+          <span className="hidden max-w-[16ch] truncate text-[12px] text-adm-on-shell-2 lg:block" title={session.user.email ?? ''}>
+            {session.user.email}
+          </span>
+          <Button variant="ghost-shell" size="sm" onClick={() => void signOut()}>
             Déconnexion
           </Button>
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col overflow-hidden">
-        {children}
-      </main>
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</main>
     </div>
   )
 }

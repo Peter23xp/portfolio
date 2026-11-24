@@ -14,7 +14,7 @@ Admin panel pour le portfolio peterakilimali.site. Permet de synchroniser les re
 
 ## Brand Personality
 
-Technique. Dense. Confiant. L'admin hérite de l'esthétique sombre du portfolio public (neutral-950, Satoshi + Clash Display), avec une couleur d'accent violet/indigo et une inspiration Linear : compact, orienté clavier, aucun chrome superflu.
+Technique. Dense. Confiant. Depuis le 2026-11-24, l'admin partage le monde du site public (DESIGN.md, « peau à chromatophores ») en version outil : coque à l'encre, zone de travail en manteau pigmenté, titres en Anybody, texte d'interface en police système, iridophore réservé à l'action principale (Sync). Inspiration Linear pour la densité : compact, orienté clavier, aucun chrome superflu.
 
 ## Anti-references
 
@@ -29,7 +29,7 @@ Technique. Dense. Confiant. L'admin hérite de l'esthétique sombre du portfolio
 2. **Consistance sur la surprise.** Le même vocabulaire visuel sur chaque composant. La délight vient de la fluidité, pas de l'ornement.
 3. **Densité intentionnelle.** Compact comme Linear — voir plus de repos à l'écran est une feature.
 4. **L'état parle.** Hover, drag, drop, syncing, featured : chaque état est lisible immédiatement, sans ambiguïté.
-5. **Dark natif.** Le fond très sombre n'est pas un mode — c'est l'identité. Contraste texte minimum 7:1.
+5. **Le monde du site, au service de la tâche.** Le monde prête la typo des titres, la palette, la densité et un geste signature (les glyphes de pigment par catégorie, qui se dilatent au dépôt) ; les contrôles restent standard. Contraste texte ≥ 4.5:1.
 
 ## Accessibility & Inclusion
 

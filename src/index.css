@@ -1,27 +1,32 @@
+/* Anybody — variable graisse + chasse, auto-hébergée. Partagée site + admin. */
+@font-face {
+  font-family: "Anybody";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  font-display: swap;
+  src: url("/fonts/anybody-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Anybody";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  font-display: swap;
+  src: url("/fonts/anybody-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  ::-webkit-scrollbar { display: none; }
-  body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    font-feature-settings: "kern", "liga";
-    @apply flex flex-col xl:items-center xl:justify-center xl:p-8 antialiased text-white font-space bg-neutral-950 pt-0 pr-0 pb-0 pl-0;
-  }
-  .font-oswald {
-    font-feature-settings: "kern";
-    letter-spacing: -0.03em;
-  }
-  .font-bricolage {
-    font-feature-settings: "kern", "liga", "calt";
-  }
-}
+/* Les styles du portfolio public sont dans src/portfolio/portfolio.css (importés par App.jsx). */
 
-/* ── Admin panel reset ──────────────────────────────────────────────────────
-   Annule les styles du portfolio public (centrage XL, padding)
-   sur les pages /admin et /login.                                          */
+/* ── Admin : même monde que le site (DESIGN.md), version outil ───────────────
+   Coque à l'encre, zone de travail en manteau pigmenté, Anybody, un seul
+   accent (iridophore) pour l'action principale.                           */
 .admin-root {
   position: fixed;
   inset: 0;
@@ -29,28 +34,42 @@
   flex-direction: column;
   overflow: hidden;
   @apply bg-adm-bg text-adm-ink font-space;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  caret-color: oklch(0.40 0.095 35);
 }
+.admin-root ::selection { background: oklch(0.40 0.095 35); color: oklch(0.955 0.016 28); }
 
 /* Scrollbar fin et discret dans les colonnes admin */
 .adm-scrollbar::-webkit-scrollbar {
   display: block;
-  width: 3px;
+  width: 6px;
 }
 .adm-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .adm-scrollbar::-webkit-scrollbar-thumb {
-  background: oklch(0.30 0.008 275);
+  background: oklch(0.74 0.035 33);
   border-radius: 9999px;
 }
 .adm-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.40 0.010 275);
+  background: oklch(0.40 0.095 35);
 }
-.adm-scrollbar { scrollbar-width: thin; scrollbar-color: oklch(0.30 0.008 275) transparent; }
+.adm-scrollbar { scrollbar-width: thin; scrollbar-color: oklch(0.74 0.035 33) transparent; }
 
 /* Focus ring unifié pour l'admin */
 .adm-focus:focus-visible {
-  outline: 2px solid oklch(0.63 0.22 277 / 0.70);
+  outline: 2px solid oklch(0.48 0.095 215);
   outline-offset: 2px;
 }
+/* points des glyphes de catégorie : le pigment se dilate au survol de dépôt */
+.adm-glyph-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* sur la coque à l'encre, l'anneau passe en iridophore clair */
+.adm-shell .adm-focus:focus-visible { outline-color: oklch(0.80 0.10 200); }
 
 @media (prefers-reduced-motion: reduce) {
   .admin-root *,
@@ -59,121 +78,4 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* LIGHT MODE USING CSS INVERT */
-html.light {
-  filter: invert(1) hue-rotate(180deg);
-  background-color: white; /* Ensure bg behaves well */
-}
-
-html.light body {
-  background-color: white; /* Ensure body matches */
-}
-
-/* Re-invert media so they look normal */
-html.light img,
-html.light video,
-html.light iframe,
-html.light .no-invert {
-  filter: invert(1) hue-rotate(180deg) !important;
-}
-
-html.light .border-gradient::before,
-html.light [style*="--border-gradient"]::before {
-  opacity: 0.5;
-}
-
-@layer utilities {
-  .border-gradient {
-    position: relative;
-  }
-  .border-gradient::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 3.5rem;
-    padding: 1px;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    background: linear-gradient(225deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.0) 100%);
-    pointer-events: none;
-  }
-
-  [style*="--border-gradient"]::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    padding: 1px;
-    border-radius: var(--border-radius-before, inherit);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    background: var(--border-gradient);
-    pointer-events: none;
-  }
-
-  .marquee-content {
-    animation: marquee-up 20s linear infinite;
-  }
-
-  .animate-on-scroll {
-    opacity: 0.01;
-    filter: blur(12px);
-  }
-  .animate-on-scroll.animate-up {
-    animation: fadeSlideBlurIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .animate-on-scroll.animate-left {
-    animation: fadeSlideBlurInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .animate-on-scroll.animate-right {
-    animation: fadeSlideBlurInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .animate-on-scroll.animate-fade {
-    animation: fadeBlurIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .animate-levitate {
-    animation: levitate 6s ease-in-out infinite;
-  }
-  .animate-levitate-delayed {
-    animation: levitate 6s ease-in-out infinite;
-    animation-delay: -3s;
-  }
-}
-
-@keyframes beam-spin { to { transform: rotate(360deg); } }
-@keyframes dots-move {
-  0% { background-position: 0 0; }
-  100% { background-position: 24px 24px; }
-}
-@keyframes marquee-up {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
-}
-@keyframes fadeSlideBlurIn {
-  0% { opacity: 0.01; transform: translateY(30px); filter: blur(12px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
-@keyframes fadeSlideBlurInLeft {
-  0% { opacity: 0.01; transform: translateX(-30px); filter: blur(12px); }
-  100% { opacity: 1; transform: translateX(0); filter: blur(0); }
-}
-@keyframes fadeSlideBlurInRight {
-  0% { opacity: 0.01; transform: translateX(30px); filter: blur(12px); }
-  100% { opacity: 1; transform: translateX(0); filter: blur(0); }
-}
-@keyframes fadeBlurIn {
-  0% { opacity: 0.01; filter: blur(12px); }
-  100% { opacity: 1; filter: blur(0); }
-}
-@keyframes flow-noodle {
-  0% { stroke-dashoffset: 24; }
-  100% { stroke-dashoffset: 0; }
-}
-@keyframes levitate {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
 }
