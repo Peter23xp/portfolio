@@ -11,6 +11,7 @@ import Featured from './portfolio/Featured.jsx';
 import { DEFAULT_CONTENT, fetchContent, pick } from './lib/content.js';
 import { Link, useNavigate } from 'react-router-dom';
 import { washClick } from './portfolio/wash.js';
+import { track } from './lib/analytics.js';
 
 const GITHUB_USER = 'Peter23xp';
 const SECTION_ORDER = {
@@ -211,6 +212,8 @@ export default function App() {
     return () => document.body.classList.remove('portfolio');
   }, []);
 
+  useEffect(() => { track('page_view'); }, []);
+
   // retour d'une étude de cas vers une ancre (#contact, #work…)
   useEffect(() => {
     if (!window.location.hash) return undefined;
@@ -314,6 +317,7 @@ export default function App() {
 
   const chooseContext = (next, event) => {
     const value = context === next ? 'neutral' : next;
+    track('context_select', value);
     const rect = event.currentTarget.getBoundingClientRect();
     setPulse({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, id: Date.now() });
     withTransition(() => {
@@ -325,7 +329,7 @@ export default function App() {
 
   const primary = {
     neutral: { href: '#contact', icon: 'ph:arrow-down-bold' },
-    recruit: { href: LINKS.cv, icon: 'ph:file-arrow-down-bold', download: true },
+    recruit: { href: '/cv', icon: 'ph:arrow-right-bold', internal: true },
     client: { href: LINKS.whatsapp, icon: 'simple-icons:whatsapp', external: true },
   }[context];
   const secondary = {
@@ -378,7 +382,7 @@ export default function App() {
           {reposState === 'error' && projects.length <= content.showcase.length && (
             <p className="notice" role="status">
               {t.work.error}{' '}
-              <a href={LINKS.github} target="_blank" rel="noopener noreferrer">{t.work.errorAction}</a>
+              <a href={LINKS.github} target="_blank" rel="noopener noreferrer" onClick={() => track('contact_click', 'github')}>{t.work.errorAction}</a>
             </p>
           )}
 
@@ -453,9 +457,9 @@ export default function App() {
               </li>
             ))}
           </ol>
-          <a className="link-action link-action--strong" href={LINKS.cv} download>
-            <Icon name="ph:file-arrow-down-bold" /> {t.journey.cv}
-          </a>
+          <Link className="link-action link-action--strong" to="/cv">
+            {t.journey.cv} <Icon name="ph:arrow-right-bold" />
+          </Link>
         </div>
       </section>
     ),
@@ -492,7 +496,7 @@ export default function App() {
           </ul>
           <div className="nav__tools">
             <LangSwitch />
-            <a className="nav__cv" href={LINKS.cv} download>{t.nav.cv}</a>
+            <Link className="nav__cv" to="/cv">{t.nav.cv}</Link>
             <button type="button" className="nav__menu" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen((v) => !v)}>
               <Icon name={menuOpen ? 'ph:x-bold' : 'ph:list-bold'} /> <span>{menuOpen ? t.nav.close : t.nav.menu}</span>
             </button>
@@ -502,7 +506,7 @@ export default function App() {
           <div id="mobile-menu" className="sheet">
             <ul>
               {navOrdered.map(([href, label]) => <li key={href}><a href={href} onClick={() => setMenuOpen(false)}>{label}</a></li>)}
-              <li><a href={LINKS.cv} download onClick={() => setMenuOpen(false)}>{t.nav.cv}</a></li>
+              <li><Link to="/cv" onClick={() => setMenuOpen(false)}>{t.nav.cv}</Link></li>
             </ul>
             <LangSwitch className="lang--sheet" />
           </div>
@@ -529,20 +533,27 @@ export default function App() {
           <p className="hero__lede" aria-live="polite">{settings.hero[`lede_${lang}`]?.[context] || t.hero.lede[context]}</p>
 
           <div className="hero__actions">
-            <a
-              className="btn-primary"
-              href={primary.href}
-              {...(primary.download ? { download: true } : {})}
-              {...(primary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-            >
-              <Icon name={primary.icon} /> {t.hero.primary[context]}
-            </a>
-            <a className="link-action link-action--on-ink" href={secondary.href}>{t.hero.secondary[context]}</a>
+            {primary.internal ? (
+              <Link className="btn-primary" to={primary.href}>
+                {t.hero.primary[context]} <Icon name={primary.icon} />
+              </Link>
+            ) : (
+              <a
+                className="btn-primary"
+                href={primary.href}
+                onClick={() => context === 'client' && track('contact_click', 'whatsapp')}
+                {...(primary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                <Icon name={primary.icon} /> {t.hero.primary[context]}
+              </a>
+            )}
+            <a className="link-action link-action--on-ink" href={secondary.href} onClick={() => context === 'recruit' && track('contact_click', 'email')}>{t.hero.secondary[context]}</a>
           </div>
         </div>
 
         <p className="hero__status">
-          {available && <><span className="signal" aria-hidden="true" /> <strong>{t.hero.available}</strong></>}
+          {available && <strong>{t.hero.available}</strong>}
+          {available && <span aria-hidden="true">·</span>}
           <span className="hero__loc">{pick(settings.profile, 'location', lang) || t.hero.location}</span>
         </p>
       </header>
@@ -557,22 +568,22 @@ export default function App() {
           <p className="close__body">{t.contact.body}</p>
           <ul className="channels">
             <li className={context !== 'client' ? 'is-primary' : ''}>
-              <a href={LINKS.email}><span className="channel__k">{t.contact.email}</span><span className="channel__v">{LINKS.emailLabel}</span><Icon name="ph:arrow-up-right-bold" /></a>
+              <a href={LINKS.email} onClick={() => track('contact_click', 'email')}><span className="channel__k">{t.contact.email}</span><span className="channel__v">{LINKS.emailLabel}</span><Icon name="ph:arrow-up-right-bold" /></a>
             </li>
             <li className={context === 'client' ? 'is-primary' : ''}>
-              <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer"><span className="channel__k">{t.contact.whatsapp}</span><span className="channel__v">{LINKS.whatsappLabel}</span><Icon name="ph:arrow-up-right-bold" /></a>
+              <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => track('contact_click', 'whatsapp')}><span className="channel__k">{t.contact.whatsapp}</span><span className="channel__v">{LINKS.whatsappLabel}</span><Icon name="ph:arrow-up-right-bold" /></a>
             </li>
             <li>
-              <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer"><span className="channel__k">{t.contact.linkedin}</span><span className="channel__v">Peter Akilimali</span><Icon name="ph:arrow-up-right-bold" /></a>
+              <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => track('contact_click', 'linkedin')}><span className="channel__k">{t.contact.linkedin}</span><span className="channel__v">Peter Akilimali</span><Icon name="ph:arrow-up-right-bold" /></a>
             </li>
             <li>
               <a href={LINKS.github} target="_blank" rel="noopener noreferrer"><span className="channel__k">{t.contact.github}</span><span className="channel__v">{LINKS.github.split('/').filter(Boolean).pop()}</span><Icon name="ph:arrow-up-right-bold" /></a>
             </li>
             <li>
-              <a href={LINKS.cv} download><span className="channel__k">{t.contact.cv}</span><span className="channel__v">{LINKS.cv.split('/').pop()}</span><Icon name="ph:file-arrow-down-bold" /></a>
+              <Link to="/cv"><span className="channel__k">{t.contact.cv}</span><span className="channel__v">{t.cv.title}</span><Icon name="ph:arrow-right-bold" /></Link>
             </li>
           </ul>
-          {available && <p className="close__status"><span className="signal" aria-hidden="true" /> {t.contact.available}</p>}
+          {available && <p className="close__status">{t.contact.available}</p>}
           <div className="close__foot">
             <span>{t.footer.line}</span>
             <a href="#top">{t.footer.top}</a>

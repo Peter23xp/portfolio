@@ -6,12 +6,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminLayout } from '../../components/admin/AdminLayout'
+import { GithubPicker } from '../../components/admin/GithubPicker'
 import { Bilingual, Field, IconButton, Icons, Panel, TextInput, Toggle, UploadButton, inputClass } from '../../components/admin/forms'
 import { Button } from '../../components/ui/button'
 import {
   deleteShowcase,
   emptyProject,
   listShowcase,
+  projectFromRepo,
+  type RepoRow,
   reorderShowcase,
   saveShowcase,
   slugify,
@@ -37,6 +40,31 @@ export default function ShowcasePage() {
   const [draft, setDraft] = useState<ShowcaseProject | null>(null)
   const [stackText, setStackText] = useState('')
   const [saving, setSaving] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+
+  const existing = useMemo(
+    () => ({
+      urls: new Set(items.map((p) => p.github_url).filter(Boolean)),
+      names: new Set(items.map((p) => p.name.toLowerCase())),
+    }),
+    [items],
+  )
+
+  // ajout depuis GitHub : projet pré-rempli, adresse unique
+  async function addFromRepo(repo: RepoRow, featured: boolean) {
+    const project = projectFromRepo(repo, items.length, featured)
+    let slug = project.slug || 'projet'
+    for (let n = 2; items.some((p) => p.slug === slug); n++) slug = `${project.slug}-${n}`
+    try {
+      const saved = await saveShowcase({ ...project, slug })
+      await load()
+      toast.success(featured ? `« ${saved.name} » ajouté en projet phare` : `« ${saved.name} » ajouté à la vitrine`, {
+        description: 'Complète ses textes et ajoute des captures quand tu veux.',
+      })
+    } catch (e) {
+      toast.error("Ajout impossible", { description: (e as Error).message })
+    }
+  }
 
   const original = useMemo(
     () => (selected === 'new' ? null : items.find((p) => p.id === selected) ?? null),
@@ -194,11 +222,18 @@ export default function ShowcasePage() {
   return (
     <AdminLayout
       actions={
-        <Button variant="on-shell" size="sm" onClick={() => open('new')}>
-          {Icons.plus} Nouveau projet
-        </Button>
+        <>
+          <Button variant="on-shell" size="sm" onClick={() => setPickerOpen(true)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z" /></svg>
+            Depuis GitHub
+          </Button>
+          <Button variant="on-shell" size="sm" onClick={() => open('new')}>
+            {Icons.plus} Nouveau projet
+          </Button>
+        </>
       }
     >
+      <GithubPicker open={pickerOpen} onClose={() => setPickerOpen(false)} existing={existing} onAdd={addFromRepo} />
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* ── Liste ── */}
         <aside className="shrink-0 border-adm-border bg-adm-surface lg:w-[320px] lg:overflow-y-auto lg:border-r">
@@ -253,7 +288,10 @@ export default function ShowcasePage() {
           </ol>
           {!loading && !loadError && items.length === 0 && selected !== 'new' && (
             <div className="px-5 pb-5">
-              <Button variant="primary" size="sm" onClick={() => open('new')}>{Icons.plus} Ajouter un premier projet</Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="primary" size="sm" onClick={() => setPickerOpen(true)}>Choisir dans GitHub</Button>
+                <Button variant="outline" size="sm" onClick={() => open('new')}>{Icons.plus} Projet hors GitHub</Button>
+              </div>
             </div>
           )}
         </aside>

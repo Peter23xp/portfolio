@@ -5,6 +5,7 @@ import Icon from './Icon.jsx';
 import Device from './Device.jsx';
 import { projectColor, washClick, washOut } from './wash.js';
 import { useTilt } from './tilt.js';
+import { track } from '../lib/analytics.js';
 import { PigmentGlyph } from './Pigment.jsx';
 import { DEFAULT_CONTENT, fetchContent, pick } from '../lib/content.js';
 import { translations } from '../i18n.js';
@@ -146,6 +147,7 @@ export default function CaseStudy() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    track('case_view', slug);
     // la page est prête : le lavis de pigment se retire
     const id = requestAnimationFrame(() => washOut());
     return () => cancelAnimationFrame(id);

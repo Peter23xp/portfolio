@@ -174,3 +174,77 @@ export async function uploadMedia(file: File, folder: string, opts?: { maxSide?:
   }
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
 }
+
+// ── Dépôts GitHub synchronisés (pour les ajouter à la vitrine) ───────────────
+export interface RepoRow {
+  github_id: number
+  repo_name: string
+  description: string | null
+  html_url: string
+  homepage: string | null
+  language: string | null
+  stars: number
+  category: string
+  is_private: boolean
+  updated_at: string
+}
+
+export async function listRepos(): Promise<RepoRow[]> {
+  const { data, error } = await supabase
+    .from('portfolio_projects')
+    .select('github_id,repo_name,description,html_url,homepage,language,stars,category,is_private,updated_at')
+    .order('updated_at', { ascending: false })
+  if (error) explain(error)
+  return (data ?? []) as RepoRow[]
+}
+
+// Crée un projet vitrine pré-rempli à partir d'un dépôt.
+export function projectFromRepo(repo: RepoRow, order: number, featured: boolean): ShowcaseProject {
+  const category = ['livre', 'hackathon', 'personnel', 'contribution'].includes(repo.category) ? repo.category : 'personnel'
+  const desc = (repo.description ?? '').replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '')
+  return {
+    ...emptyProject(order),
+    name: repo.repo_name,
+    slug: slugify(repo.repo_name),
+    category,
+    tagline_fr: desc,
+    tagline_en: desc,
+    stack: repo.language ? [repo.language] : [],
+    site_url: repo.homepage && /^https?:/.test(repo.homepage) ? repo.homepage : '',
+    github_url: repo.is_private ? '' : repo.html_url,
+    is_featured: featured,
+  }
+}
+
+// ── Mesure d'audience (migration 006) ─────────────────────────────────────────
+export interface EventRow {
+  created_at: string
+  type: string
+  label: string | null
+  path: string | null
+  session_id: string | null
+  referrer_host: string | null
+  device: string | null
+}
+
+/** Évènements depuis une date, paginés (Supabase renvoie 1 000 lignes max par requête). */
+export async function listEvents(sinceIso: string, maxPages = 30): Promise<EventRow[]> {
+  const out: EventRow[] = []
+  const size = 1000
+  for (let page = 0; page < maxPages; page++) {
+    const { data, error } = await supabase
+      .from('portfolio_events')
+      .select('created_at,type,label,path,session_id,referrer_host,device')
+      .gte('created_at', sinceIso)
+      .order('created_at', { ascending: true })
+      .range(page * size, page * size + size - 1)
+    if (error) {
+      if (/does not exist|schema cache|42P01/i.test(error.message))
+        throw new Error('Table absente : applique la migration 006_portfolio_analytics.sql dans Supabase (SQL Editor).')
+      explain(error)
+    }
+    out.push(...((data ?? []) as EventRow[]))
+    if (!data || data.length < size) break
+  }
+  return out
+}

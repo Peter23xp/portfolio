@@ -211,11 +211,6 @@ body.portfolio ::-webkit-scrollbar-thumb { background: var(--ink); border-radius
   padding: 0 var(--pad) 1.75rem; font-size: 0.9375rem; color: var(--on-ink-2);
 }
 .hero__status strong { color: var(--on-ink); font-weight: 650; }
-.signal { position: relative; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--iris); flex: none; }
-@media (prefers-reduced-motion: no-preference) {
-  .signal::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--iris); animation: iris-flash 2.8s var(--ease) infinite; }
-}
-@keyframes iris-flash { 0% { transform: scale(1); opacity: 0.7; } 70%, 100% { transform: scale(2.6); opacity: 0; } }
 
 /* ── Sections ───────────────────────────────────────────────────────────── */
 .section { padding-block: clamp(5rem, 10vw, 8.5rem); }
@@ -640,3 +635,15 @@ body.portfolio ::-webkit-scrollbar-thumb { background: var(--ink); border-radius
   .case__device, .stage { transform: none; transition: none; }
   .stage__lead { transform: none; }
 }
+
+/* ── Page CV : le PDF s'affiche dans le site ─────────────────────────────── */
+.cv__hero { padding-bottom: clamp(2.5rem, 6vw, 4rem); }
+.cv__heroin { padding-top: clamp(1.5rem, 5vw, 3.5rem); }
+.cv__title { font-size: clamp(2.8rem, 7vw, 5rem); line-height: 0.95; font-weight: 780; font-stretch: 118%; letter-spacing: -0.03em; }
+.cv__main { background: var(--mantle-2); padding-block: clamp(2rem, 5vw, 4rem) clamp(4rem, 8vw, 6rem); min-height: 60vh; }
+.cv__pages { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+.cv__page {
+  display: block; width: 100%; max-width: 880px; height: auto; background: #fff;
+  border-radius: 6px; box-shadow: 0 6px 18px oklch(0.2 0.05 35 / 0.16);
+}
+.cv__status { text-align: center; margin-bottom: 1.5rem; }

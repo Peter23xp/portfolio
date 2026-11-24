@@ -11,6 +11,7 @@ import { GitHubSyncButton } from './GitHubSyncButton'
 import { Button } from '../ui/button'
 import { signOut, useSession } from '../../lib/auth-client'
 import { cn } from '../../lib/utils'
+import { OPT_OUT_KEY } from '../../lib/analytics.js'
 
 interface AdminLayoutProps {
   children: ReactNode
@@ -27,6 +28,7 @@ const TABS = [
   { to: '/admin/vitrine', label: 'Projets vitrine', end: false },
   { to: '/admin/parcours', label: 'Parcours', end: false },
   { to: '/admin/contenu', label: 'Contenu', end: false },
+  { to: '/admin/analytics', label: 'Analytics', end: false },
 ]
 
 // même marque que la navigation du site : un amas de chromatophores
@@ -57,6 +59,8 @@ export function AdminLayout({ children, isSyncing = false, onSync, repoCount, ac
 
   if (isPending) return <LoadingShell />
   if (!session) return <Navigate to="/login" replace />
+  // tes propres visites ne comptent pas dans les statistiques
+  localStorage.setItem(OPT_OUT_KEY, '1')
 
   return (
     <div className="admin-root">
